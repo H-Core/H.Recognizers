@@ -1,0 +1,18 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFrameworks>net5.0-windows;net4.8</TargetFrameworks>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="H.Recorders.NAudioRecorder" Version="0.9.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\libs\H.Converters.WitAiConverter\H.Converters.WitAiConverter.csproj" />
+    <ProjectReference Include="..\..\libs\H.Converters.YandexConverter\H.Converters.YandexConverter.csproj" />
+  </ItemGroup>
+
+</Project>
