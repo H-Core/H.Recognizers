@@ -9,7 +9,7 @@ using Grpc.Core;
 using H.Core.Converters;
 using Yandex.Cloud.Ai.Stt.V2;
 
-namespace H.NET.Converters
+namespace H.Converters
 {
     public sealed class YandexStreamingRecognition : StreamingRecognition
     {

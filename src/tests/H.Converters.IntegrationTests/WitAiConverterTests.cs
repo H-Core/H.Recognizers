@@ -3,9 +3,10 @@ using H.Core;
 using H.Recorders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.NET.Converters.IntegrationTests
+namespace H.Converters.IntegrationTests
 {
     [TestClass]
+    [Ignore]
     public class WitAiConverterTests
     {
         public static IRecorder CreateRecorder() => new NAudioRecorder();

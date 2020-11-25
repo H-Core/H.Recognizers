@@ -2,11 +2,11 @@
 
   <PropertyGroup>
     <TargetFrameworks>netstandard2.0;net4.6</TargetFrameworks>
-    <RootNamespace>H.NET.Converters</RootNamespace>
+    <RootNamespace>H.Converters</RootNamespace>
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet">
-    <Version>0.9.0</Version>
+    <Version>0.9.1</Version>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Description></Description>
     <PackageReleaseNotes>Initial release.</PackageReleaseNotes>

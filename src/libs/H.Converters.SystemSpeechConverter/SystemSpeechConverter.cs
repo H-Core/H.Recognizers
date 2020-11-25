@@ -7,7 +7,7 @@ using H.Core;
 using H.Core.Converters;
 using Microsoft.Speech.Recognition;
 
-namespace H.NET.Converters
+namespace H.Converters
 {
     public sealed class SystemSpeechConverter : Converter, IConverter
     {

@@ -3,10 +3,11 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.NET.Converters.IntegrationTests
+namespace H.Converters.IntegrationTests
 {
 
     [TestClass]
+    [Ignore]
     public class SystemSpeechConverterTests
     {
         [TestMethod]

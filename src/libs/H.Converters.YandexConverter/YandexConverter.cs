@@ -5,13 +5,13 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
-using H.NET.Converters.Utilities;
+using H.Converters.Utilities;
 using H.Core;
 using H.Core.Converters;
 using Newtonsoft.Json;
 using Yandex.Cloud.Ai.Stt.V2;
 
-namespace H.NET.Converters
+namespace H.Converters
 {
     public sealed class YandexConverter : Converter, IConverter
     {

@@ -7,7 +7,7 @@ using H.Core;
 using H.Core.Converters;
 using Newtonsoft.Json;
 
-namespace H.NET.Converters
+namespace H.Converters
 {
     public sealed class WitAiConverter : Converter, IConverter
     {

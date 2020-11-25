@@ -4,7 +4,7 @@ using System.Web;
 
 #nullable enable
 
-namespace H.NET.Converters.Utilities
+namespace H.Converters.Utilities
 {
     public static class HttpExtensions
     {

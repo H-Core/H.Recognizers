@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using H.Core.Converters;
 using Microsoft.Speech.Recognition;
 
-namespace H.NET.Converters
+namespace H.Converters
 {
     public sealed class SystemSpeechStreamingRecognition : StreamingRecognition
     {

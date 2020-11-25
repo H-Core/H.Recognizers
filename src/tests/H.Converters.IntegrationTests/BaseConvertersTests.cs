@@ -5,7 +5,7 @@ using H.NET.Converters.IntegrationTests.Utilities;
 using H.Core;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.NET.Converters.IntegrationTests
+namespace H.Converters.IntegrationTests
 {
     public static class BaseConvertersTests
     {

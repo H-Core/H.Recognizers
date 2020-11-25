@@ -6,7 +6,7 @@ using System.Windows;
 using H.Core;
 using H.Recorders;
 
-namespace H.NET.Converters.TestApp
+namespace H.Converters.App.WPF
 {
     public partial class MainWindow
     {
