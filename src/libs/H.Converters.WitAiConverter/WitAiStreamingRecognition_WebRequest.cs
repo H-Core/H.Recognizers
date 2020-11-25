@@ -30,7 +30,7 @@ namespace H.NET.Converters
         {
             Token = token ?? throw new ArgumentNullException(nameof(token));
 
-            HttpWebRequest = WebRequest.Create("https://api.wit.ai/speech") as HttpWebRequest ?? throw new InvalidOperationException("WebRequest is null");
+            HttpWebRequest = WebRequest.Create(new Uri("https://api.wit.ai/speech")) as HttpWebRequest ?? throw new InvalidOperationException("WebRequest is null");
             HttpWebRequest.Method = "POST";
             HttpWebRequest.Headers["Authorization"] = "Bearer " + Token;
             HttpWebRequest.Headers["Transfer-encoding"] = "chunked";
@@ -57,7 +57,7 @@ namespace H.NET.Converters
                         writer.Write(bytes);
                     }
 
-                    await Stream.FlushAsync();
+                    await Stream.FlushAsync().ConfigureAwait(false);
                 }
                 finally
                 {
@@ -87,7 +87,7 @@ namespace H.NET.Converters
             var isBadRequest = false;
             try
             {
-                response = await HttpWebRequest.GetResponseAsync();
+                response = await HttpWebRequest.GetResponseAsync().ConfigureAwait(false);
             }
             catch (WebException exception)
             {
@@ -98,7 +98,7 @@ namespace H.NET.Converters
             using var responseDispose = response;
             using var stream = response.GetResponseStream() ?? throw new InvalidOperationException("Response stream is null");
             using var reader = new StreamReader(stream);
-            var json = await reader.ReadToEndAsync();
+            var json = await reader.ReadToEndAsync().ConfigureAwait(false);
 
             if (isBadRequest)
             {

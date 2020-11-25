@@ -56,9 +56,13 @@ namespace H.NET.Converters
             throw new NotImplementedException();
         }
 
+#pragma warning disable CA1063 // Implement IDisposable Correctly
         public override void Dispose()
+#pragma warning restore CA1063 // Implement IDisposable Correctly
         {
             SpeechRecognitionEngine.Dispose();
+
+            base.Dispose();
         }
 
         #endregion

@@ -10,6 +10,9 @@ namespace H.NET.Converters.Utilities
     {
         public static Uri WithQuery(this Uri uri, Dictionary<string, string?> dictionary)
         {
+            uri = uri ?? throw new ArgumentNullException(nameof(uri));
+            dictionary = dictionary ?? throw new ArgumentNullException(nameof(dictionary));
+
             var builder = new UriBuilder(uri);
             var parameters = HttpUtility.ParseQueryString(uri.Query);
 

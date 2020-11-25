@@ -58,7 +58,7 @@ namespace H.NET.Converters
             var call = client.StreamingRecognize(new Metadata
             {
                 {"authorization", $"Bearer {IamToken}"}
-            });
+            }, cancellationToken: cancellationToken);
 
             await call.RequestStream.WriteAsync(new StreamingRecognitionRequest
             {
