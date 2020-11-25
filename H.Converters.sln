@@ -1,10 +1,7 @@
-
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30717.126
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Converters", "src\libs\H.Converters\H.Converters.csproj", "{8C39C5CD-A8D1-4528-9FCE-0190BD515466}"
-EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "libs", "libs", "{6E5BF389-3D3F-4D74-9DD0-3B199CB529C5}"
 	ProjectSection(SolutionItems) = preProject
 		src\libs\Directory.Build.props = src\libs\Directory.Build.props
@@ -23,7 +20,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Converters.Tests", "src\tests\H.Converters.Tests\H.Converters.Tests.csproj", "{F2548AE2-D736-4C21-942F-55C4F592EFF2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Converters.SystemSpeechConverter", "src\libs\H.Converters.SystemSpeechConverter\H.Converters.SystemSpeechConverter.csproj", "{82BAF374-B000-455F-BD7B-939DFD3E25EC}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Converters.WitAiConverter", "src\libs\H.Converters.WitAiConverter\H.Converters.WitAiConverter.csproj", "{DC8B6793-A390-43AF-9827-A8B09F915266}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Converters.YandexConverter", "src\libs\H.Converters.YandexConverter\H.Converters.YandexConverter.csproj", "{29FAC41C-8FEE-4530-9614-2430C1E720CD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -31,21 +32,26 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{8C39C5CD-A8D1-4528-9FCE-0190BD515466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{8C39C5CD-A8D1-4528-9FCE-0190BD515466}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{8C39C5CD-A8D1-4528-9FCE-0190BD515466}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{8C39C5CD-A8D1-4528-9FCE-0190BD515466}.Release|Any CPU.Build.0 = Release|Any CPU
-		{F2548AE2-D736-4C21-942F-55C4F592EFF2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{F2548AE2-D736-4C21-942F-55C4F592EFF2}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{F2548AE2-D736-4C21-942F-55C4F592EFF2}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{F2548AE2-D736-4C21-942F-55C4F592EFF2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{82BAF374-B000-455F-BD7B-939DFD3E25EC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{82BAF374-B000-455F-BD7B-939DFD3E25EC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{82BAF374-B000-455F-BD7B-939DFD3E25EC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{82BAF374-B000-455F-BD7B-939DFD3E25EC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC8B6793-A390-43AF-9827-A8B09F915266}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC8B6793-A390-43AF-9827-A8B09F915266}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC8B6793-A390-43AF-9827-A8B09F915266}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC8B6793-A390-43AF-9827-A8B09F915266}.Release|Any CPU.Build.0 = Release|Any CPU
+		{29FAC41C-8FEE-4530-9614-2430C1E720CD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{29FAC41C-8FEE-4530-9614-2430C1E720CD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{29FAC41C-8FEE-4530-9614-2430C1E720CD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{29FAC41C-8FEE-4530-9614-2430C1E720CD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{8C39C5CD-A8D1-4528-9FCE-0190BD515466} = {6E5BF389-3D3F-4D74-9DD0-3B199CB529C5}
-		{F2548AE2-D736-4C21-942F-55C4F592EFF2} = {9CAA231D-7BE1-46C9-ACD6-EB2E569CEBEA}
+		{82BAF374-B000-455F-BD7B-939DFD3E25EC} = {6E5BF389-3D3F-4D74-9DD0-3B199CB529C5}
+		{DC8B6793-A390-43AF-9827-A8B09F915266} = {6E5BF389-3D3F-4D74-9DD0-3B199CB529C5}
+		{29FAC41C-8FEE-4530-9614-2430C1E720CD} = {6E5BF389-3D3F-4D74-9DD0-3B199CB529C5}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {1493AEE4-9211-46E9-BFE6-8F629EAC5693}
