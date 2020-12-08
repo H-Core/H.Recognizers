@@ -13,26 +13,62 @@ using Yandex.Cloud.Ai.Stt.V2;
 
 namespace H.Converters
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public sealed class YandexConverter : Converter, IConverter
     {
         #region Properties
 
         bool IConverter.IsStreamingRecognitionSupported => true;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Lang { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public string Topic { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public bool ProfanityFilter { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public string Format { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public int SampleRateHertz { get; set; }
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public string FolderId { get; set; } = string.Empty;
+        
+        /// <summary>
+        /// 
+        /// </summary>
         public string OAuthToken { get; set; } = string.Empty;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string? IamToken { get; set; }
 
         #endregion
 
         #region Constructors
 
+        /// <summary>
+        /// 
+        /// </summary>
         public YandexConverter()
         {
             AddSetting(nameof(FolderId), o => FolderId = o, Any, string.Empty);
@@ -49,6 +85,11 @@ namespace H.Converters
 
         #region Public methods
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public override async Task<IStreamingRecognition> StartStreamingRecognitionAsync(CancellationToken cancellationToken = default)
         {
             IamToken ??= await RequestIamTokenByOAuthTokenAsync(OAuthToken, cancellationToken).ConfigureAwait(false);
@@ -85,6 +126,12 @@ namespace H.Converters
             return new YandexStreamingRecognition(call);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public override async Task<string> ConvertAsync(byte[] bytes, CancellationToken cancellationToken = default)
         {
             IamToken ??= await RequestIamTokenByOAuthTokenAsync(OAuthToken, cancellationToken).ConfigureAwait(false);

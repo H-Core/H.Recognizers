@@ -6,7 +6,7 @@ using System.Web;
 
 namespace H.Converters.Utilities
 {
-    public static class HttpExtensions
+    internal static class HttpExtensions
     {
         public static Uri WithQuery(this Uri uri, Dictionary<string, string?> dictionary)
         {
