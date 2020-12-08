@@ -1,16 +1,16 @@
 syntax = "proto3";
 
-package yandex.cloud.mdb.redis.v1alpha.config;
+package yandex.cloud.mdb.redis.v1.config;
 
 import "google/protobuf/wrappers.proto";
 import "yandex/cloud/validation.proto";
 
-option go_package = "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/redis/v1alpha/config;redis";
-option java_package = "yandex.cloud.api.mdb.redis.v1alpha.config";
+option go_package = "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/redis/v1/config;redis";
+option java_package = "yandex.cloud.api.mdb.redis.v1.config";
 
 // Fields and structure of `RedisConfig` reflects Redis configuration file
 // parameters.
-message RedisConfig5_0 {
+message RedisConfig6_0 {
   enum MaxmemoryPolicy {
     MAXMEMORY_POLICY_UNSPECIFIED = 0;
 
@@ -56,14 +56,15 @@ message RedisConfig5_0 {
   string password = 3 [(pattern) = "[a-zA-Z0-9@=+?*.,!&#$^<>_-]{8,128}"];
 }
 
-message RedisConfigSet5_0 {
-  // Effective settings for a Redis 5.0 cluster (a combination of settings
+
+message RedisConfigSet6_0 {
+  // Effective settings for a Redis 6.0 cluster (a combination of settings
   // defined in [user_config] and [default_config]).
-  RedisConfig5_0 effective_config = 1;
+  RedisConfig6_0 effective_config = 1;
 
-  // User-defined settings for a Redis 5.0 cluster.
-  RedisConfig5_0 user_config = 2;
+  // User-defined settings for a Redis 6.0 cluster.
+  RedisConfig6_0 user_config = 2;
 
-  // Default configuration for a Redis 5.0 cluster.
-  RedisConfig5_0 default_config = 3;
+  // Default configuration for a Redis 6.0 cluster.
+  RedisConfig6_0 default_config = 3;
 }

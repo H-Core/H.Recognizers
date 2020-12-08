@@ -18,12 +18,17 @@ import "yandex/cloud/mdb/postgresql/v1/config/postgresql9_6.proto";
 import "yandex/cloud/mdb/postgresql/v1/config/postgresql10.proto";
 import "yandex/cloud/mdb/postgresql/v1/config/postgresql10_1c.proto";
 import "yandex/cloud/mdb/postgresql/v1/config/postgresql11.proto";
+import "yandex/cloud/mdb/postgresql/v1/config/postgresql11_1c.proto";
 import "yandex/cloud/mdb/postgresql/v1/config/postgresql12.proto";
+import "yandex/cloud/mdb/postgresql/v1/config/postgresql12_1c.proto";
 import "yandex/cloud/mdb/postgresql/v1/config/host9_6.proto";
 import "yandex/cloud/mdb/postgresql/v1/config/host10.proto";
 import "yandex/cloud/mdb/postgresql/v1/config/host10_1c.proto";
 import "yandex/cloud/mdb/postgresql/v1/config/host11.proto";
+import "yandex/cloud/mdb/postgresql/v1/config/host11_1c.proto";
 import "yandex/cloud/mdb/postgresql/v1/config/host12.proto";
+import "yandex/cloud/mdb/postgresql/v1/config/host12_1c.proto";
+import "yandex/cloud/mdb/postgresql/v1/maintenance.proto";
 
 option go_package = "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/postgresql/v1;postgresql";
 option java_package = "yandex.cloud.api.mdb.postgresql.v1";
@@ -115,6 +120,15 @@ service ClusterService {
     };
   }
 
+  // Reschedule planned maintenance operation.
+  rpc RescheduleMaintenance (RescheduleMaintenanceRequest) returns (operation.Operation) {
+    option (google.api.http) = { post: "/managed-postgresql/v1/clusters/{cluster_id}:rescheduleMaintenance" body: "*"};
+    option (yandex.cloud.api.operation) = {
+      metadata: "RescheduleMaintenanceMetadata"
+      response: "Cluster"
+    };
+  }
+
   // Start a manual failover on the specified PostgreSQL cluster.
   rpc StartFailover (StartClusterFailoverRequest) returns (operation.Operation) {
     option (google.api.http) = { post: "/managed-postgresql/v1/clusters/{cluster_id}:startFailover" body: "*" };
@@ -127,6 +141,11 @@ service ClusterService {
   // Retrieves logs for the specified PostgreSQL cluster.
   rpc ListLogs (ListClusterLogsRequest) returns (ListClusterLogsResponse) {
     option (google.api.http) = { get: "/managed-postgresql/v1/clusters/{cluster_id}:logs" };
+  }
+
+  // Same as ListLogs but using server-side streaming. Also allows for 'tail -f' semantics.
+  rpc StreamLogs (StreamClusterLogsRequest) returns (stream StreamLogRecord) {
+    option (google.api.http) = { get: "/managed-postgresql/v1/clusters/{cluster_id}:stream_logs" };
   }
 
   // Retrieves the list of Operation resources for the specified cluster.
@@ -243,6 +262,9 @@ message CreateClusterRequest {
 
   // ID of the network to create the cluster in.
   string network_id = 10 [(required) = true, (length) = "<=50"];
+
+  // User security groups
+  repeated string security_group_ids = 11;
 }
 
 message CreateClusterMetadata {
@@ -274,6 +296,12 @@ message UpdateClusterRequest {
 
   // New name for the cluster.
   string name = 6 [(length) = "<=63", (pattern) = "[a-zA-Z0-9_-]*"];
+
+  // Window of maintenance operations.
+  MaintenanceWindow maintenance_window = 7;
+
+  // User security groups
+  repeated string security_group_ids = 8;
 }
 
 message UpdateClusterMetadata {
@@ -380,6 +408,9 @@ message RestoreClusterRequest {
 
   // ID of the folder to create the PostgreSQL cluster in.
   string folder_id = 11 [(length) = "<=50"];
+
+  // User security groups
+  repeated string security_group_ids = 12;
 }
 
 message RestoreClusterMetadata {
@@ -401,6 +432,30 @@ message StartClusterFailoverRequest {
 message StartClusterFailoverMetadata {
   // ID of the PostgreSQL cluster being failovered.
   string cluster_id = 1;
+}
+message RescheduleMaintenanceRequest {
+  // Required. ID of the PostgreSQL cluster to maintenance reschedule.
+  string cluster_id = 1 [(required) = true, (length) = "<=50"];
+
+  enum RescheduleType {
+    RESCHEDULE_TYPE_UNSPECIFIED = 0;
+    IMMEDIATE = 1;
+    NEXT_AVAILABLE_WINDOW = 2;
+    SPECIFIC_TIME = 3;
+  }
+  // Required. The type of reschedule request.
+  RescheduleType reschedule_type = 2[(required) = true];
+
+  // The time for SPECIFIC_TIME reschedule. Limited by two weeks since first time scheduled.
+  google.protobuf.Timestamp delayed_until = 3;
+}
+
+message RescheduleMaintenanceMetadata {
+  // Required. ID of the PostgreSQL cluster.
+  string cluster_id = 1;
+
+  // Required. New time of the planned maintenance. Can be in the past for rescheduled to "IMMEDIATE".
+  google.protobuf.Timestamp delayed_until = 4;
 }
 
 message LogRecord {
@@ -460,7 +515,62 @@ message ListClusterLogsResponse {
   // is larger than [ListClusterLogsRequest.page_size], use the [next_page_token] as the value
   // for the [ListClusterLogsRequest.page_token] query parameter in the next list request.
   // Each subsequent list request will have its own [next_page_token] to continue paging through the results.
+  // This value is interchangeable with `next_record_token` from StreamLogs method.
   string next_page_token = 2;
+}
+
+message StreamLogRecord {
+  // One of the requested log records.
+  LogRecord record = 1;
+
+  // This token allows you to continue streaming logs starting from the exact
+  // same record. To continue streaming, specify value of `next_record_token`
+  // as value for `record_token` parameter in the next StreamLogs request.
+  // This value is interchangeable with `next_page_token` from ListLogs method.
+  string next_record_token = 2;
+}
+
+message StreamClusterLogsRequest {
+  // Required. ID of the PostgreSQL cluster.
+  string cluster_id = 1 [(required) = true, (length) = "<=50"];
+
+  // Columns from logs table to get in the response.
+  repeated string column_filter = 2;
+
+  ServiceType service_type = 3;
+
+  enum ServiceType {
+    SERVICE_TYPE_UNSPECIFIED = 0;
+
+    // Logs of PostgreSQL activity.
+    POSTGRESQL = 1;
+
+    // Logs of connection pooler activity.
+    POOLER = 2;
+  }
+
+  // Start timestamp for the logs request.
+  google.protobuf.Timestamp from_time = 4;
+
+  // End timestamp for the logs request.
+  // If this field is not set, all existing logs will be sent and then the new ones as
+  // they appear. In essence it has 'tail -f' semantics.
+  google.protobuf.Timestamp to_time = 5;
+
+  // Record token. Set `record_token` to the `next_record_token` returned by a previous StreamLogs
+  // request to start streaming from next log record.
+  string record_token = 6 [(length) = "<=100"];
+
+  // A filter expression that filters resources listed in the response.
+  // The expression must specify:
+  // 1. The field name. Currently filtering can be applied to the [LogRecord.logs.message.hostname],
+  // [LogRecord.logs.message.error_severity] (for POSTGRESQL service), [LogRecord.logs.message.level] (for POOLER service) fields.
+  // 2. A conditional operator. Can be either `=` or `!=` for single values, `IN` or `NOT IN` for lists of values.
+  // 3. The value. Must be 1-63 characters long and match the regular expression `^[a-z0-9.-]{1,61}$`.
+  // Examples of a filter:
+  // `message.hostname='node1.db.cloud.yandex.net'`
+  // `message.error_severity IN ("ERROR", "FATAL", "PANIC") AND message.hostname = "node1.db.cloud.yandex.net"`
+  string filter = 7 [(length) = "<=1000"];
 }
 
 message ListClusterOperationsRequest {
@@ -653,19 +763,25 @@ message ConfigSpec {
   // Configuration of a PostgreSQL cluster.
   oneof postgresql_config {
     // Configuration for a PostgreSQL 9.6 cluster.
-    config.PostgresqlConfig9_6 postgresql_config_9_6 = 2;
+    config.PostgresqlConfig9_6 postgresql_config_9_6 = 2 [json_name="postgresqlConfig_9_6"];
 
     // Configuration for a PostgreSQL 10 1C cluster.
-    config.PostgresqlConfig10_1C postgresql_config_10_1c = 10;
+    config.PostgresqlConfig10_1C postgresql_config_10_1c = 10 [json_name="postgresqlConfig_10_1c"];
 
     // Configuration for a PostgreSQL 10 cluster.
-    config.PostgresqlConfig10 postgresql_config_10 = 3;
+    config.PostgresqlConfig10 postgresql_config_10 = 3 [json_name="postgresqlConfig_10"];
 
     // Configuration for a PostgreSQL 11 cluster.
-    config.PostgresqlConfig11 postgresql_config_11 = 7;
+    config.PostgresqlConfig11 postgresql_config_11 = 7 [json_name="postgresqlConfig_11"];
+
+    // Configuration for a PostgreSQL 11 1C cluster.
+    config.PostgresqlConfig11_1C postgresql_config_11_1c = 13 [json_name="postgresqlConfig_11_1c"];
 
     // Configuration for a PostgreSQL 12 cluster.
-    config.PostgresqlConfig12 postgresql_config_12 = 11;
+    config.PostgresqlConfig12 postgresql_config_12 = 11 [json_name="postgresqlConfig_12"];
+
+    // Configuration for a PostgreSQL 12 1C cluster.
+    config.PostgresqlConfig12_1C postgresql_config_12_1c = 14 [json_name="postgresqlConfig_12_1c"];
   }
 
   // Configuration of the connection pooler.
@@ -682,23 +798,32 @@ message ConfigSpec {
 
   // Access policy to DB
   Access access = 9;
+
+  // Configuration of the performance diagnostics service.
+  PerformanceDiagnostics performance_diagnostics = 12;
 }
 
 message ConfigHostSpec {
   oneof postgresql_config {
     // Configuration for a host with PostgreSQL 9.6 server deployed.
-    config.PostgresqlHostConfig9_6 postgresql_config_9_6 = 1;
+    config.PostgresqlHostConfig9_6 postgresql_config_9_6 = 1 [json_name="postgresqlHostConfig_9_6"];
 
     // Configuration for a host with PostgreSQL 10 1C server deployed.
-    config.PostgresqlHostConfig10_1C postgresql_config_10_1c = 4;
+    config.PostgresqlHostConfig10_1C postgresql_config_10_1c = 4 [json_name="postgresqlHostConfig_10_1c"];
 
     // Configuration for a host with PostgreSQL 10 server deployed.
-    config.PostgresqlHostConfig10 postgresql_config_10 = 2;
+    config.PostgresqlHostConfig10 postgresql_config_10 = 2 [json_name="postgresqlHostConfig_10"];
 
     // Configuration for a host with PostgreSQL 11 server deployed.
-    config.PostgresqlHostConfig11 postgresql_config_11 = 3;
+    config.PostgresqlHostConfig11 postgresql_config_11 = 3 [json_name="postgresqlHostConfig_11"];
+
+    // Configuration for a host with PostgreSQL 11 1C server deployed.
+    config.PostgresqlHostConfig11_1C postgresql_config_11_1c = 6 [json_name="postgresqlHostConfig_11_1c"];
 
     // Configuration for a host with PostgreSQL 12 server deployed.
-    config.PostgresqlHostConfig12 postgresql_config_12 = 5;
+    config.PostgresqlHostConfig12 postgresql_config_12 = 5 [json_name="postgresqlHostConfig_12"];
+
+    // Configuration for a host with PostgreSQL 12 1C server deployed.
+    config.PostgresqlHostConfig12_1C postgresql_config_12_1c = 7 [json_name="postgresqlHostConfig_12_1c"];
   }
 }

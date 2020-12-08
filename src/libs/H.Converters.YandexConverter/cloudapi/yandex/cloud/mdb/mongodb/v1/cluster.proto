@@ -3,10 +3,13 @@ syntax = "proto3";
 package yandex.cloud.mdb.mongodb.v1;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/wrappers.proto";
 import "google/type/timeofday.proto";
 import "yandex/cloud/mdb/mongodb/v1/config/mongodb3_6.proto";
 import "yandex/cloud/mdb/mongodb/v1/config/mongodb4_0.proto";
 import "yandex/cloud/mdb/mongodb/v1/config/mongodb4_2.proto";
+import "yandex/cloud/mdb/mongodb/v1/config/mongodb4_4.proto";
+import "yandex/cloud/mdb/mongodb/v1/maintenance.proto";
 
 option go_package = "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mongodb/v1;mongodb";
 option java_package = "yandex.cloud.api.mdb.mongodb.v1";
@@ -108,6 +111,15 @@ message Cluster {
 
   // Indicates current sharding status of the cluster.
   bool sharded = 13;
+
+  // Window of maintenance operations.
+  MaintenanceWindow maintenance_window = 14;
+
+  // Maintenance operation planned at nearest maintenance_window.
+  MaintenanceOperation planned_operation = 15;
+
+  // User security groups
+  repeated string security_group_ids = 16;
 }
 
 // Monitoring system.
@@ -123,7 +135,7 @@ message Monitoring {
 }
 
 message ClusterConfig {
-  // Version of MongoDB server software. Possible values: `3.6`, `4.0`, `4.2`.
+  // Version of MongoDB server software. Possible values: `3.6`, `4.0`, `4.2`, `4.4`.
   string version = 1;
 
   // MongoDB feature compatibility version. See usage details in [MongoDB documentation](https://docs.mongodb.com/manual/reference/command/setFeatureCompatibilityVersion/).
@@ -132,22 +144,29 @@ message ClusterConfig {
   // * `3.6` — persist data compatibility for version 3.6. After setting this option the data will not be compatible with 3.4 or lower.
   // * `4.0` — persist data compatibility for version 4.0. After setting this option the data will not be compatible with 3.6 or lower.
   // * `4.2` — persist data compatibility for version 4.2. After setting this option the data will not be compatible with 4.0 or lower.
+  // * `4.4` — persist data compatibility for version 4.4. After setting this option the data will not be compatible with 4.2 or lower.
   string feature_compatibility_version = 5;
 
   // Configuration for MongoDB servers in the cluster.
   oneof mongodb {
     // Configuration and resource allocation for a MongoDB 3.6 cluster.
-    Mongodb3_6 mongodb_3_6 = 2;
+    Mongodb3_6 mongodb_3_6 = 2 [json_name="mongodb_3_6"];
 
     // Configuration and resource allocation for a MongoDB 4.0 cluster.
-    Mongodb4_0 mongodb_4_0 = 4;
+    Mongodb4_0 mongodb_4_0 = 4 [json_name="mongodb_4_0"];
 
     // Configuration and resource allocation for a MongoDB 4.2 cluster.
-    Mongodb4_2 mongodb_4_2 = 7;
+    Mongodb4_2 mongodb_4_2 = 7 [json_name="mongodb_4_2"];
+
+    // Configuration and resource allocation for a MongoDB 4.4 cluster.
+    Mongodb4_4 mongodb_4_4 = 8 [json_name="mongodb_4_4"];
   }
 
   // Time to start the daily backup, in the UTC timezone.
   google.type.TimeOfDay backup_window_start = 3;
+
+  // Retain period of automatically created backup in days
+  google.protobuf.Int64Value backup_retain_period_days = 9;
 
   // Access policy to DB
   Access access = 6;
@@ -176,6 +195,15 @@ message Mongodb3_6 {
     Resources resources = 2;
   }
 
+  message MongoInfra {
+    config.MongosConfigSet3_6 config_mongos = 1;
+    config.MongoCfgConfigSet3_6 config_mongocfg = 2;
+
+    // Resources allocated to mongoinfra (mongos+mongocfg) hosts.
+    Resources resources = 3;
+  }
+
+
   // Configuration and resource allocation for mongod in a MongoDB 3.6 cluster.
   Mongod mongod = 1;
 
@@ -184,6 +212,9 @@ message Mongodb3_6 {
 
   // Configuration and resource allocation for mongos in a MongoDB 3.6 cluster.
   Mongos mongos = 3;
+
+  // Configuration and resource allocation for mongoinfra (mongos+mongocfg) in a MongoDB 3.6 cluster.
+  MongoInfra mongoinfra = 4;
 }
 
 message Mongodb4_0 {
@@ -211,6 +242,14 @@ message Mongodb4_0 {
     Resources resources = 2;
   }
 
+  message MongoInfra {
+    config.MongosConfigSet4_0 config_mongos = 1;
+    config.MongoCfgConfigSet4_0 config_mongocfg = 2;
+
+    // Resources allocated to mongoinfra (mongos+mongocfg) hosts.
+    Resources resources = 3;
+  }
+
   // Configuration and resource allocation for mongod in a MongoDB 4.0 cluster.
   Mongod mongod = 1;
 
@@ -219,6 +258,9 @@ message Mongodb4_0 {
 
   // Configuration and resource allocation for mongos in a MongoDB 4.0 cluster.
   Mongos mongos = 3;
+
+  // Configuration and resource allocation for mongoinfra (mongos+mongocfg) in a MongoDB 4.0 cluster.
+  MongoInfra mongoinfra = 4;
 }
 
 message Mongodb4_2 {
@@ -246,6 +288,14 @@ message Mongodb4_2 {
     Resources resources = 2;
   }
 
+  message MongoInfra {
+    config.MongosConfigSet4_2 config_mongos = 1;
+    config.MongoCfgConfigSet4_2 config_mongocfg = 2;
+
+    // Resources allocated to mongoinfra (mongos+mongocfg) hosts.
+    Resources resources = 3;
+  }
+
   // Configuration and resource allocation for mongod in a MongoDB 4.2 cluster.
   Mongod mongod = 1;
 
@@ -254,6 +304,55 @@ message Mongodb4_2 {
 
   // Configuration and resource allocation for mongos in a MongoDB 4.2 cluster.
   Mongos mongos = 3;
+
+  // Configuration and resource allocation for mongoinfra (mongos+mongocfg) in a MongoDB 4.2 cluster.
+  MongoInfra mongoinfra = 4;
+}
+
+message Mongodb4_4 {
+  message Mongod {
+    // Configuration for mongod 4.4 hosts.
+    config.MongodConfigSet4_4 config = 1;
+
+    // Resources allocated to mongod hosts.
+    Resources resources = 2;
+  }
+
+  message MongoCfg {
+    // Configuration for mongocfg 4.4 hosts.
+    config.MongoCfgConfigSet4_4 config = 1;
+
+    // Resources allocated to mongocfg hosts.
+    Resources resources = 2;
+  }
+
+  message Mongos {
+    // Configuration for mongos 4.4 hosts.
+    config.MongosConfigSet4_4 config = 1;
+
+    // Resources allocated to mongos hosts.
+    Resources resources = 2;
+  }
+
+  message MongoInfra {
+    config.MongosConfigSet4_4 config_mongos = 1;
+    config.MongoCfgConfigSet4_4 config_mongocfg = 2;
+
+    // Resources allocated to mongoinfra (mongos+mongocfg) hosts.
+    Resources resources = 3;
+  }
+
+  // Configuration and resource allocation for mongod in a MongoDB 4.4 cluster.
+  Mongod mongod = 1;
+
+  // Configuration and resource allocation for mongocfg in a MongoDB 4.4 cluster.
+  MongoCfg mongocfg = 2;
+
+  // Configuration and resource allocation for mongos in a MongoDB 4.4 cluster.
+  Mongos mongos = 3;
+
+  // Configuration and resource allocation for mongoinfra (mongos+mongocfg) in a MongoDB 4.4 cluster.
+  MongoInfra mongoinfra = 4;
 }
 
 message Shard {
@@ -276,6 +375,9 @@ message Host {
 
     // A mongocfg host.
     MONGOCFG = 3;
+
+    // A mongoinfra (mongos+mongocfg) host.
+    MONGOINFRA = 4;
   }
 
   enum Role {

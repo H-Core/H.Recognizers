@@ -30,7 +30,7 @@ message InstanceGroup {
   map<string, string> labels = 6;
 
   // Instance template for creating the instance group.
-  // For more information, see [Instance Templates](/docs/compute/concepts/ig-instance-templates).
+  // For more information, see [Instance Templates](/docs/compute/concepts/instance-groups/instance-template).
   InstanceTemplate instance_template = 7;
 
   // [Scaling policy](/docs/compute/concepts/instance-groups/scale) of the instance group.
@@ -62,6 +62,15 @@ message InstanceGroup {
   // Status of the instance group.
   Status status = 17;
 
+  repeated Variable variables = 18;
+
+  // Flag prohibiting deletion of the instance group.
+  //
+  // Allowed values:</br>- `false`: The instance group can be deleted.</br>- `true`: The instance group cannot be deleted.
+  //
+  // The default is `false`.
+  bool deletion_protection = 19;
+
   enum Status {
     STATUS_UNSPECIFIED = 0;
 
@@ -86,6 +95,11 @@ message InstanceGroup {
     // Instance group is being deleted.
     DELETING = 5;
   }
+}
+
+message Variable {
+  string key = 1 [(length) = "1-128", (pattern) = "[a-zA-Z0-9._-]*"];
+  string value = 2 [(length) = "<=128"];
 }
 
 message LoadBalancerState {
@@ -152,6 +166,9 @@ message ScalePolicy {
     // [Automatic scaling policy](/docs/compute/concepts/instance-groups/scale#auto-scale) of the instance group.
     AutoScale auto_scale = 2;
   }
+
+  // Test spec for [automatic scaling policy](/docs/compute/concepts/instance-groups/scale#auto-scale) of the instance group.
+  AutoScale test_auto_scale = 3;
 
   message AutoScale {
     // Lower limit for instance count in each zone.
@@ -232,8 +249,17 @@ message ScalePolicy {
     // Name of custom metric in Yandex Monitoring that should be used for scaling.
     string metric_name = 3 [(required) = true, (pattern) = "[a-zA-Z0-9./@_][ 0-9a-zA-Z./@_,:;()\\[\\]<>-]{0,198}"];
 
+    // Labels of custom metric in Yandex Monitoring that should be used for scaling.
+    map<string, string> labels = 5 [(pattern) = "[a-zA-Z0-9./@_][ 0-9a-zA-Z./@_,:;()\\[\\]<>-]{0,198}", (map_key).pattern = "^[a-zA-Z][0-9a-zA-Z_]{0,31}$"];
+
     // Target value for the custom metric. Instance Groups maintains this level for each availability zone.
     double target = 4 [(value) = ">0"];
+
+    // Folder id of custom metric in Yandex Monitoring that should be used for scaling.
+    string folder_id = 6 [(length) = "<=50"];
+
+    // Service of custom metric in Yandex Monitoring that should be used for scaling.
+    string service = 7 [(length) = "<=200"];
   }
 
 
@@ -250,9 +276,13 @@ message DeployPolicy {
   int64 max_unavailable = 1 [(value) = "0-100"];
 
   // The maximum number of instances that can be deleted at the same time.
+  //
+  //The value 0 is any number of virtual machines within the allowed values.
   int64 max_deleting = 2 [(value) = "0-100"];
 
   // The maximum number of instances that can be created at the same time.
+  //
+  //The value 0 is any number of virtual machines within the allowed values.
   int64 max_creating = 3 [(value) = "0-100"];
 
   // The maximum number of instances that can be temporarily allocated above the group's target size
@@ -265,6 +295,20 @@ message DeployPolicy {
   // has elapsed and all health checks are passed.
   // See [yandex.cloud.compute.v1.instancegroup.ManagedInstance.Status] for more information.
   google.protobuf.Duration startup_duration = 7 [(value) = "0m-1h"];
+
+  // Affects the lifecycle of the instance during deployment.
+  Strategy strategy = 8;
+
+  enum Strategy {
+    STRATEGY_UNSPECIFIED = 0;
+
+    // Instance Groups can forcefully stop a running instance. This is the default.
+    PROACTIVE = 1;
+
+    // Instance Groups does not stop a running instance.
+    // Instead, it will wait until the instance stops itself or becomes unhealthy.
+    OPPORTUNISTIC = 2;
+  }
 }
 
 message AllocationPolicy {
@@ -282,18 +326,31 @@ message InstanceTemplate {
   string description = 1 [(length) = "<=256"];
 
   // Resource labels as `key:value` pairs.
-  map<string, string> labels = 2 [(size) = "<=64", (length) = "<=128", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_0-9a-z]*"];
+  map<string, string> labels = 2 [(size) = "<=64", (length) = "<=128", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_./\\@0-9a-z]*"];
 
   // ID of the hardware platform configuration for the instance.
   // Platforms allows you to create various types of instances: with a large amount of memory,
   // with a large number of cores, with a burstable performance.
   // For more information, see [Platforms](/docs/compute/concepts/vm-platforms).
-  string platform_id = 3;
+  string platform_id = 3 [(required) = true];
 
   // Computing resources of the instance such as the amount of memory and number of cores.
   ResourcesSpec resources_spec = 4 [(required) = true];
 
   // The metadata `key:value` pairs assigned to this instance template. This includes custom metadata and predefined keys.
+  //
+  // Metadata values may contain one of the supported placeholders:
+  //   {instance_group.id}
+  //   {instance.short_id}
+  //   {instance.index}
+  //   {instance.index_in_zone}
+  //   {instance.zone_id}
+  // InstanceGroup and Instance labels may be copied to metadata following way:
+  //   {instance_group.labels.some_label_key}
+  //   {instance.labels.another_label_key}
+  // These placeholders will be substituted for each created instance anywhere in the value text.
+  // In the rare case the value requires to contain this placeholder explicitly,
+  // it must be escaped with double brackets, in example {instance.index}.
   //
   // For example, you may use the metadata in order to provide your public SSH key to the instance.
   // For more information, see [Metadata](/docs/compute/concepts/vm-metadata).
@@ -313,14 +370,50 @@ message InstanceTemplate {
 
   // Service account ID for the instance.
   string service_account_id = 10;
+
+  // Network settings for the instance.
+  NetworkSettings network_settings = 11;
+
+  // Name of the instance.
+  // In order to be unique it must contain at least on of instance unique placeholders:
+  //   {instance.short_id}
+  //   {instance.index}
+  //   combination of {instance.zone_id} and {instance.index_in_zone}
+  // Example: my-instance-{instance.index}
+  // If not set, default is used: {instance_group.id}-{instance.short_id}
+  // It may also contain another placeholders, see metadata doc for full list.
+  string name = 12 [(length) = "<=128"];
+
+  // Host name for the instance.
+  // This field is used to generate the [yandex.cloud.compute.v1.Instance.fqdn] value.
+  // The host name must be unique within the network and region.
+  // If not specified, the host name will be equal to [yandex.cloud.compute.v1.Instance.id] of the instance
+  // and FQDN will be `<id>.auto.internal`. Otherwise FQDN will be `<hostname>.<region_id>.internal`.
+  //
+  // In order to be unique it must contain at least on of instance unique placeholders:
+  //   {instance.short_id}
+  //   {instance.index}
+  //   combination of {instance.zone_id} and {instance.index_in_zone}
+  // Example: my-instance-{instance.index}
+  // If not set, `name` value will be used
+  // It may also contain another placeholders, see metadata doc for full list.
+  string hostname = 13 [(length) = "<=128"];
+
+  // Placement Group
+  PlacementPolicy placement_policy = 14;
+}
+
+message PlacementPolicy {
+  // Identifier of placement group
+  string placement_group_id = 1;
 }
 
 message ResourcesSpec {
   // The amount of memory available to the instance, specified in bytes.
-  int64 memory = 1 [(value) = "<=274877906944"];
+  int64 memory = 1 [(value) = "<=824633720832"];
 
   // The number of cores available to the instance.
-  int64 cores = 2 [(value) = "1,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,40,44,48,52,56,60,64"];
+  int64 cores = 2 [(value) = "2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,40,44,48,52,56,60,64,68,72,76,80"];
 
   // Baseline level of CPU performance with the ability to burst performance above that baseline level.
   // This field sets baseline performance for each core.
@@ -350,8 +443,12 @@ message AttachedDiskSpec {
   // This value can be used to reference the device for mounting, resizing, and so on, from within the instance.
   string device_name = 2 [(pattern) = "|[a-z][-_0-9a-z]{0,19}"];
 
+  //oneof disk_spec or disk_id
   // Disk specification that is attached to the instance. For more information, see [Disks](/docs/compute/concepts/disk).
   DiskSpec disk_spec = 3 [(required) = true];
+
+  // Set to use an existing disk. To set use variables.
+  string disk_id = 4 [(length) = "<=128", (pattern) = "[-a-zA-Z0-9._{}]*"];
 
   message DiskSpec {
     // Description of the disk.
@@ -370,6 +467,10 @@ message AttachedDiskSpec {
       // ID of the snapshot that will be used for disk creation.
       string snapshot_id = 5 [(length) = "<=50"];
     }
+
+    // When set to true, disk will not be deleted even after managed instance is deleted.
+    // It will be a user's responsibility to delete such disks.
+    bool preserve_after_instance_delete = 6;
   }
 }
 
@@ -385,6 +486,9 @@ message NetworkInterfaceSpec {
 
   // Primary IPv6 address that is assigned to the instance for this network interface. IPv6 not available yet.
   PrimaryAddressSpec primary_v6_address_spec = 4;
+
+  // IDs of security groups.
+  repeated string security_group_ids = 5;
 }
 
 message PrimaryAddressSpec {
@@ -396,6 +500,8 @@ message PrimaryAddressSpec {
 message OneToOneNatSpec {
   // IP version for the public IP address.
   IpVersion ip_version = 1;
+  // Manual set static public IP. To set use variables. (optional)
+  string address = 2;
 }
 
 enum IpVersion {
@@ -415,20 +521,31 @@ message SchedulingPolicy {
   bool preemptible = 1;
 }
 
+message NetworkSettings {
+  enum Type {
+    TYPE_UNSPECIFIED = 0;
+    STANDARD = 1;
+    SOFTWARE_ACCELERATED = 2;
+    HARDWARE_ACCELERATED = 3;
+  }
+  // Type of instance network.
+  Type type = 1;
+}
+
 message LoadBalancerSpec {
-  // Specification of the target group that the instance group will be added to. For more information, see [Target groups and resources](/docs/load-balancer/target-resources).
+  // Specification of the target group that the instance group will be added to. For more information, see [Target groups and resources](/docs/load-balancer/concepts/target-resources).
   TargetGroupSpec target_group_spec = 1;
 }
 
 message TargetGroupSpec {
   // Name of the target group.
-  string name = 1 [(pattern) = "|[a-z][-a-z0-9]{1,61}[a-z0-9]"];
+  string name = 1 [(pattern) = "|[a-z]([-a-z0-9]{0,61}[a-z0-9])?"];
 
   // Description of the target group.
   string description = 2 [(length) = "<=256"];
 
   // Resource labels as `key:value` pairs.
-  map<string, string> labels = 3 [(size) = "<=64", (length) = "<=63", (pattern) = "[-_0-9a-z]*", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_0-9a-z]*"];
+  map<string, string> labels = 3 [(size) = "<=64", (length) = "<=63", (pattern) = "[-_./\\@0-9a-z]*", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_./\\@0-9a-z]*"];
 }
 
 message HealthChecksSpec {

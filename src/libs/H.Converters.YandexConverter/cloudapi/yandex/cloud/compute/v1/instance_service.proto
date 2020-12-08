@@ -5,6 +5,7 @@ package yandex.cloud.compute.v1;
 import "google/api/annotations.proto";
 import "google/protobuf/field_mask.proto";
 import "yandex/cloud/api/operation.proto";
+import "yandex/cloud/compute/v1/disk.proto";
 import "yandex/cloud/compute/v1/instance.proto";
 import "yandex/cloud/operation/operation.proto";
 import "yandex/cloud/validation.proto";
@@ -115,6 +116,32 @@ service InstanceService {
     };
   }
 
+  // net
+
+  rpc AddOneToOneNat (AddInstanceOneToOneNatRequest) returns (operation.Operation) {
+    option (google.api.http) = { post: "/compute/v1/instances/{instance_id}/addOneToOneNat" body: "*"};
+    option (yandex.cloud.api.operation) = {
+      metadata: "AddInstanceOneToOneNatMetadata"
+      response: "Instance"
+     };
+  }
+
+  rpc RemoveOneToOneNat (RemoveInstanceOneToOneNatRequest) returns (operation.Operation) {
+    option (google.api.http) = { post: "/compute/v1/instances/{instance_id}/removeOneToOneNat" body: "*"};
+    option (yandex.cloud.api.operation) = {
+      metadata: "RemoveInstanceOneToOneNatMetadata"
+      response: "Instance"
+    };
+  }
+
+  rpc UpdateNetworkInterface (UpdateInstanceNetworkInterfaceRequest) returns (operation.Operation) {
+    option (google.api.http) = { patch: "/compute/v1/instances/{instance_id}/updateNetworkInterface" body: "*"};
+    option (yandex.cloud.api.operation) = {
+      metadata: "UpdateInstanceNetworkInterfaceMetadata"
+      response: "Instance"
+    };
+  }
+
   // Lists operations for the specified instance.
   rpc ListOperations (ListInstanceOperationsRequest) returns (ListInstanceOperationsResponse) {
     option (google.api.http) = { get: "/compute/v1/instances/{instance_id}/operations" };
@@ -183,13 +210,13 @@ message CreateInstanceRequest {
   string folder_id = 1 [(required) = true, (length) = "<=50"];
 
   // Name of the instance.
-  string name = 2 [(pattern) = "|[a-z][-a-z0-9]{1,61}[a-z0-9]"];
+  string name = 2 [(pattern) = "|[a-z]([-a-z0-9]{0,61}[a-z0-9])?"];
 
   // Description of the instance.
   string description = 3 [(length) = "<=256"];
 
   // Resource labels as `key:value` pairs.
-  map<string, string> labels = 4 [(yandex.cloud.size) = "<=64", (length) = "<=63", (pattern) = "[-_0-9a-z]*", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_0-9a-z]*"];
+  map<string, string> labels = 4 [(yandex.cloud.size) = "<=64", (length) = "<=63", (pattern) = "[-_./\\@0-9a-z]*", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_./\\@0-9a-z]*"];
 
   // ID of the availability zone where the instance resides.
   // To get a list of available zones, use the [yandex.cloud.compute.v1.ZoneService.List] request
@@ -233,7 +260,7 @@ message CreateInstanceRequest {
   // The host name must be unique within the network and region.
   // If not specified, the host name will be equal to [yandex.cloud.compute.v1.Instance.id] of the instance
   // and FQDN will be `<id>.auto.internal`. Otherwise FQDN will be `<hostname>.<region_id>.internal`.
-  string hostname = 12 [(pattern) = "|[a-z][-a-z0-9]{1,61}[a-z0-9]"];
+  string hostname = 12 [(pattern) = "|[a-z]([-a-z0-9]{0,61}[a-z0-9])?"];
 
   // Scheduling policy configuration.
   SchedulingPolicy scheduling_policy = 13;
@@ -263,7 +290,7 @@ message UpdateInstanceRequest {
   google.protobuf.FieldMask update_mask = 2;
 
   // Name of the instance.
-  string name = 3 [(pattern) = "|[a-z][-a-z0-9]{1,61}[a-z0-9]"];
+  string name = 3 [(pattern) = "|[a-z]([-a-z0-9]{0,61}[a-z0-9])?"];
 
   // Description of the instance.
   string description = 4 [(length) = "<=256"];
@@ -271,7 +298,7 @@ message UpdateInstanceRequest {
   // Resource labels as `key:value` pairs.
   //
   // Existing set of `labels` is completely replaced by the provided set.
-  map<string, string> labels = 5 [(yandex.cloud.size) = "<=64", (length) = "<=63", (pattern) = "[-_0-9a-z]*", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_0-9a-z]*"];
+  map<string, string> labels = 5 [(yandex.cloud.size) = "<=64", (length) = "<=63", (pattern) = "[-_./\\@0-9a-z]*", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_./\\@0-9a-z]*"];
 
   // ID of the hardware platform configuration for the instance.
   // This field affects the available values in [resources_spec] field.
@@ -430,6 +457,45 @@ message DetachInstanceDiskMetadata {
   string disk_id = 2;
 }
 
+// net
+
+message AddInstanceOneToOneNatRequest {
+  string instance_id = 1;
+  string network_interface_index = 2;
+  string internal_address = 3; // optional
+  OneToOneNatSpec one_to_one_nat_spec = 4;
+}
+
+message AddInstanceOneToOneNatMetadata {
+  string instance_id = 1;
+}
+
+message RemoveInstanceOneToOneNatRequest {
+  string instance_id = 1;
+  string network_interface_index = 2;
+  string internal_address = 3; // optional
+}
+
+message RemoveInstanceOneToOneNatMetadata {
+  string instance_id = 1;
+}
+
+message UpdateInstanceNetworkInterfaceRequest {
+  string instance_id = 1 [(required) = true];
+  string network_interface_index = 2 [(required) = true];
+  google.protobuf.FieldMask update_mask = 3;
+
+  string subnet_id = 4;
+  PrimaryAddressSpec primary_v4_address_spec = 5;
+  PrimaryAddressSpec primary_v6_address_spec = 6;
+  repeated string security_group_ids = 7;
+}
+
+message UpdateInstanceNetworkInterfaceMetadata {
+  string instance_id = 1;
+  string network_interface_index = 2;
+}
+
 message ListInstanceOperationsRequest {
   // ID of the Instance resource to list operations for.
   string instance_id = 1 [(required) = true, (length) = "<=50"];
@@ -460,7 +526,7 @@ message ResourcesSpec {
   int64 memory = 1 [(required) = true, (value) = "<=274877906944"];
 
   // The number of cores available to the instance.
-  int64 cores = 2 [(required) = true, (value) = "1,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32"];
+  int64 cores = 2 [(required) = true, (value) = "2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32,34,36,40,44,48,52,56,60,64,68,72,76,80"];
 
   // Baseline level of CPU performance with the ability to burst performance above that baseline level.
   // This field sets baseline performance for each core.
@@ -509,7 +575,7 @@ message AttachedDiskSpec {
 
   message DiskSpec {
     // Name of the disk.
-    string name = 1 [(pattern) = "|[a-z][-a-z0-9]{1,61}[a-z0-9]"];
+    string name = 1 [(pattern) = "|[a-z]([-a-z0-9]{0,61}[a-z0-9])?"];
 
     // Description of the disk.
     string description = 2 [(length) = "<=256"];
@@ -520,6 +586,12 @@ message AttachedDiskSpec {
 
     // Size of the disk, specified in bytes.
     int64 size = 4 [(required) = true, (value) = "4194304-4398046511104"];
+
+    // Block size of the disk, specified in bytes. The default is 4096.
+    int64 block_size = 8;
+
+    // Placement policy configuration.
+    DiskPlacementPolicy disk_placement_policy = 7;
 
     oneof source {
       // ID of the image to create the disk from.
@@ -540,6 +612,9 @@ message NetworkInterfaceSpec {
 
   // Primary IPv6 address that will be assigned to the instance for this network interface. IPv6 not available yet.
   PrimaryAddressSpec primary_v6_address_spec = 3;
+
+  // ID's of security groups attached to the interface
+  repeated string security_group_ids = 6;
 }
 
 message PrimaryAddressSpec {
@@ -554,5 +629,6 @@ message PrimaryAddressSpec {
 
 message OneToOneNatSpec {
   // External IP address version.
-  IpVersion ip_version = 1 [(required) = true];
+  IpVersion ip_version = 1; //only if address unspecified
+  string address = 2; //set static IP by value
 }

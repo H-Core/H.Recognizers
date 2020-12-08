@@ -5,6 +5,7 @@ package yandex.cloud.compute.v1.instancegroup;
 import "google/protobuf/field_mask.proto";
 import "google/api/annotations.proto";
 
+import "yandex/cloud/access/access.proto";
 import "yandex/cloud/api/operation.proto";
 import "yandex/cloud/compute/v1/instancegroup/instance_group.proto";
 import "yandex/cloud/operation/operation.proto";
@@ -99,6 +100,22 @@ service InstanceGroupService {
     option (google.api.http) = { get: "/compute/v1/instanceGroups/{instance_group_id}/instances" };
   }
 
+  // Delete instances from the instance group.
+  rpc DeleteInstances (DeleteInstancesRequest) returns (operation.Operation) {
+    option (yandex.cloud.api.operation) = {
+      metadata: "DeleteInstancesMetadata"
+      response: "InstanceGroup"
+    };
+  }
+
+  // Stop instances from the instance group.
+  rpc StopInstances (StopInstancesRequest) returns (operation.Operation) {
+    option (yandex.cloud.api.operation) = {
+      metadata: "StopInstancesMetadata"
+      response: "InstanceGroup"
+    };
+  }
+
   // Lists operations for the specified instance group.
   rpc ListOperations (ListInstanceGroupOperationsRequest) returns (ListInstanceGroupOperationsResponse) {
     option (google.api.http) = { get: "/compute/v1/instanceGroups/{instance_group_id}/operations" };
@@ -107,6 +124,29 @@ service InstanceGroupService {
   // Lists logs for the specified instance group.
   rpc ListLogRecords (ListInstanceGroupLogRecordsRequest) returns (ListInstanceGroupLogRecordsResponse) {
     option (google.api.http) = { get: "/compute/v1/instanceGroups/{instance_group_id}:logs" };
+  }
+
+  // Lists existing access bindings for the specified instance group.
+  rpc ListAccessBindings (access.ListAccessBindingsRequest) returns (access.ListAccessBindingsResponse) {
+    option (google.api.http) = { get: "/compute/v1/instanceGroups/{resource_id}:listAccessBindings" };
+  }
+
+  // Sets access bindings for the specified instance group.
+  rpc SetAccessBindings (access.SetAccessBindingsRequest) returns (operation.Operation) {
+    option (google.api.http) = { post: "/compute/v1/instanceGroups/{resource_id}:setAccessBindings" body: "*" };
+    option (yandex.cloud.api.operation) = {
+      metadata: "access.SetAccessBindingsMetadata"
+      response: "google.protobuf.Empty"
+    };
+  }
+
+  // Updates access bindings for the specified instance group.
+  rpc UpdateAccessBindings (access.UpdateAccessBindingsRequest) returns (operation.Operation) {
+    option (google.api.http) = { post: "/compute/v1/instanceGroups/{resource_id}:updateAccessBindings" body: "*" };
+    option (yandex.cloud.api.operation) = {
+      metadata: "access.UpdateAccessBindingsMetadata"
+      response: "google.protobuf.Empty"
+    };
   }
 }
 
@@ -134,13 +174,13 @@ message CreateInstanceGroupRequest {
   string folder_id = 1 [(required) = true];
 
   // Name of the instance group.
-  string name = 3 [(pattern) = "|[a-z][-a-z0-9]{1,61}[a-z0-9]"];
+  string name = 3 [(pattern) = "|[a-z]([-a-z0-9]{0,61}[a-z0-9])?"];
 
   // Description of the instance group.
   string description = 4 [(length) = "<=256"];
 
   // Resource labels as `key:value` pairs.
-  map<string, string> labels = 5 [(yandex.cloud.size) = "<=64", (length) = "<=63", (pattern) = "[-_0-9a-z]*", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_0-9a-z]*"];
+  map<string, string> labels = 5 [(yandex.cloud.size) = "<=64", (length) = "<=63", (pattern) = "[-_./\\@0-9a-z]*", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_./\\@0-9a-z]*"];
 
   // Instance template that the instance group belongs to.
   InstanceTemplate instance_template = 6 [(required) = true];
@@ -164,6 +204,15 @@ message CreateInstanceGroupRequest {
   // made by the Instance Groups component on behalf of the user (for example, creating instances, adding them to load balancer target group, etc.). For more information, see [Service accounts](/docs/iam/concepts/users/service-accounts).
   // To get the service account ID, use a [yandex.cloud.iam.v1.ServiceAccountService.List] request.
   string service_account_id = 12;
+
+  repeated Variable variables = 13;
+
+  // Flag prohibiting deletion of the instance group.
+  //
+  // Allowed values:</br>- `false`: The instance group can be deleted.</br>- `true`: The instance group cannot be deleted.
+  //
+  // The default is `false`.
+  bool deletion_protection = 14;
 }
 
 message CreateInstanceGroupFromYamlRequest {
@@ -189,7 +238,7 @@ message UpdateInstanceGroupRequest {
   google.protobuf.FieldMask update_mask = 2;
 
   // Name of the instance group.
-  string name = 3 [(pattern) = "|[a-z][-a-z0-9]{1,61}[a-z0-9]"];
+  string name = 3 [(pattern) = "|[a-z]([-a-z0-9]{0,61}[a-z0-9])?"];
 
   // Description of the instance group.
   string description = 4 [(length) = "<=256"];
@@ -197,7 +246,7 @@ message UpdateInstanceGroupRequest {
   // Resource labels as `key:value` pairs.
   //
   // The existing set of `labels` is completely replaced by the provided set.
-  map<string, string> labels = 5 [(yandex.cloud.size) = "<=64", (length) = "<=63", (pattern) = "[-_0-9a-z]*", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_0-9a-z]*"];
+  map<string, string> labels = 5 [(yandex.cloud.size) = "<=64", (length) = "<=63", (pattern) = "[-_./\\@0-9a-z]*", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_./\\@0-9a-z]*"];
 
   // Instance template that the instance group belongs to.
   InstanceTemplate instance_template = 6 [(required) = true];
@@ -221,6 +270,11 @@ message UpdateInstanceGroupRequest {
 
   // Load Balancer specification for load balancing support.
   LoadBalancerSpec load_balancer_spec = 14;
+
+  repeated Variable variables = 15;
+
+  // Flag that inhibits deletion of the instance group
+  bool deletion_protection = 16;
 }
 
 message UpdateInstanceGroupFromYamlRequest {
@@ -274,6 +328,11 @@ message DeleteInstanceGroupMetadata {
 
 message DeleteInstancesMetadata {
   // ID of the instance group that the instances are being deleted from.
+  string instance_group_id = 1;
+}
+
+message StopInstancesMetadata {
+  // ID of the instance group that the instances are being stopped from.
   string instance_group_id = 1;
 }
 
@@ -346,6 +405,32 @@ message ListInstanceGroupInstancesResponse {
   // in the next list request. Each subsequent list request will have its own
   // [next_page_token] to continue paging through the results.
   string next_page_token = 2;
+}
+
+message DeleteInstancesRequest {
+  // ID of the instance group that the instances are being deleted from.
+  // To get the ID of the instance group, use the [InstanceGroupService.List] request.
+  string instance_group_id = 1 [(required) = true, (length) = "<=50"];
+
+  // IDs of the instances to delete. Instances will be deleted along with all dependent resources.
+  // Only IDs from the ManagedInstance.id field are allowed, not ManagedInstance.instance_id.
+  repeated string managed_instance_ids = 2 [(size) = ">=1", (length) = "<=50"];
+
+  // If set to true, the target size of instance group will not be reduced and
+  // a new instance will be created instead of the deleted one. By default, the target size of instance group
+  // will be reduced by the specified number of instance IDs.
+  bool create_another = 3;
+}
+
+message StopInstancesRequest {
+  // ID of the instance group that the instances are being stopped from.
+  // To get the ID of the instance group, use the [InstanceGroupService.List] request.
+  string instance_group_id = 1 [(required) = true, (length) = "<=50"];
+
+  // IDs of the instances to stop. After stopping, the instance can be updated, started, or deleted
+  // according to scale and deploy policies.
+  // Only IDs from the ManagedInstance.id field are allowed, not ManagedInstance.instance_id.
+  repeated string managed_instance_ids = 2 [(size) = ">=1", (length) = "<=50"];
 }
 
 message ListInstanceGroupOperationsRequest {

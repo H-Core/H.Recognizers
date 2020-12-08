@@ -5,6 +5,8 @@ package yandex.cloud.mdb.redis.v1;
 import "google/protobuf/timestamp.proto";
 import "google/type/timeofday.proto";
 import "yandex/cloud/mdb/redis/v1/config/redis5_0.proto";
+import "yandex/cloud/mdb/redis/v1/config/redis6_0.proto";
+import "yandex/cloud/mdb/redis/v1/maintenance.proto";
 
 option go_package = "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/redis/v1;redis";
 option java_package = "yandex.cloud.api.mdb.redis.v1";
@@ -106,6 +108,15 @@ message Cluster {
 
   // Redis cluster mode on/off.
   bool sharded = 13;
+
+  // Window of maintenance operations.
+  MaintenanceWindow maintenance_window = 14;
+
+  // Maintenance operation planned at nearest maintenance_window.
+  MaintenanceOperation planned_operation = 15;
+
+  // User security groups
+  repeated string security_group_ids = 16;
 }
 
 message Monitoring {
@@ -126,7 +137,9 @@ message ClusterConfig {
   // Configuration for Redis servers in the cluster.
   oneof redis_config {
     // Configuration of a Redis 5.0 server.
-    config.RedisConfigSet5_0 redis_config_5_0 = 2;
+    config.RedisConfigSet5_0 redis_config_5_0 = 2 [json_name="redisConfig_5_0"];
+    // Configuration of a Redis 6.0 server.
+    config.RedisConfigSet6_0 redis_config_6_0 = 6 [json_name="redisConfig_6_0"];
   }
 
   // Resources allocated to Redis hosts.

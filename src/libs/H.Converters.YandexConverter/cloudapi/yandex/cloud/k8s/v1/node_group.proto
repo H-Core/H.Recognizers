@@ -5,6 +5,7 @@ package yandex.cloud.k8s.v1;
 import "google/protobuf/timestamp.proto";
 
 import "yandex/cloud/k8s/v1/maintenance.proto";
+import "yandex/cloud/k8s/v1/node.proto";
 import "yandex/cloud/k8s/v1/version.proto";
 import "yandex/cloud/validation.proto";
 
@@ -68,6 +69,9 @@ message NodeGroup {
   // Allocation policy by which resources for node group are allocated to zones and regions.
   NodeGroupAllocationPolicy allocation_policy = 10;
 
+  // Deploy policy according to which the updates are rolled out.
+  DeployPolicy deploy_policy = 18;
+
   // ID of the managed instance group associated with this node group.
   string instance_group_id = 11;
 
@@ -75,72 +79,20 @@ message NodeGroup {
   // Deprecated. Use version_info.current_version.
   string node_version = 12;
 
+  // Detailed information about the Kubernetes version that is running on the node.
   VersionInfo version_info = 13;
 
+  // Maintenance policy of the node group.
   NodeGroupMaintenancePolicy maintenance_policy = 14;
-}
 
-message NodeTemplate {
-  // ID of the hardware platform configuration for the node.
-  string platform_id = 1;
+  // Support for unsafe sysctl parameters. For more details see [documentation](https://kubernetes.io/docs/tasks/administer-cluster/sysctl-cluster/).
+  repeated string allowed_unsafe_sysctls = 15;
 
-  // Computing resources of the node such as the amount of memory and number of cores.
-  ResourcesSpec resources_spec = 2;
+  // Taints that are applied to the nodes of the node group at creation time.
+  repeated Taint node_taints = 16;
 
-  // Specification for the boot disk that will be attached to the node.
-
-  // The metadata as `key:value` pairs assigned to this instance template. This includes custom metadata and predefined keys.
-  //
-  // For example, you may use the metadata in order to provide your public SSH key to the node.
-  // For more information, see [Metadata](/docs/compute/concepts/vm-metadata).
-  DiskSpec boot_disk_spec = 3;
-  map<string, string> metadata = 4 [(size) = "<=64", (length) = "<=131072", (map_key).length = "1-63", (map_key).pattern = "[a-z][-_0-9a-z]*"];
-
-  // Specification for the create network interfaces for the node group compute instances.
-  NodeAddressSpec v4_address_spec = 5;
-
-  // Scheduling policy configuration.
-  SchedulingPolicy scheduling_policy = 6;
-}
-
-message NodeAddressSpec {
-  // One-to-one NAT configuration. Setting up one-to-one NAT ensures that public IP addresses are assigned to nodes, and therefore internet is accessible for all nodes of the node group. If the field is not set, NAT will not be set up.
-  OneToOneNatSpec one_to_one_nat_spec = 1;
-}
-
-message OneToOneNatSpec {
-  // IP version for the public IP address.
-  IpVersion ip_version = 1;
-}
-
-enum IpVersion {
-  IP_VERSION_UNSPECIFIED = 0;
-
-  // IPv4 address, for example 192.168.0.0.
-  IPV4 = 1;
-
-  // IPv6 address, not available yet.
-  IPV6 = 2;
-}
-
-message ResourcesSpec {
-  // Amount of memory available to the node, specified in bytes.
-  int64 memory = 1 [(value) = "0-274877906944"];
-
-  // Number of cores available to the node.
-  int64 cores = 2 [(value) = "0,1,2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,32"];
-
-  // Baseline level of CPU performance with the possibility to burst performance above that baseline level.
-  // This field sets baseline performance for each core.
-  int64 core_fraction = 3 [(value) = "0,5,20,50,100"];
-}
-
-message DiskSpec {
-  // ID of the disk type.
-  string disk_type_id = 1 [(pattern) = "|network-ssd|network-hdd"];
-
-  // Size of the disk, specified in bytes.
-  int64 disk_size = 2 [(value) = "0-4398046511104"];
+  // Labels that are assigned to the nodes of the node group at creation time.
+  map<string, string> node_labels = 17;
 }
 
 message ScalePolicy {
@@ -148,11 +100,23 @@ message ScalePolicy {
     option (exactly_one) = true;
     // Fixed scale policy of the node group.
     FixedScale fixed_scale = 1;
+
+    // Auto scale policy of the node group.
+    AutoScale auto_scale = 2;
   }
 
   message FixedScale {
     // Number of nodes in the node group.
     int64 size = 1 [(value) = "0-100"];
+  }
+
+  message AutoScale {
+    // Minimum number of nodes in the node group.
+    int64 min_size = 1 [(value) = "0-100"];
+    // Maximum number of nodes in the node group.
+    int64 max_size = 2 [(value) = "0-100"];
+    // Initial number of nodes in the node group.
+    int64 initial_size = 3 [(value) = "0-100"];
   }
 }
 
@@ -169,16 +133,29 @@ message NodeGroupLocation {
   string subnet_id = 2;
 }
 
-message SchedulingPolicy {
-  // True for preemptible compute instances. Default value is false. Preemptible compute instances are stopped at least once every 24 hours, and can be stopped at any time
-  // if their resources are needed by Compute.
-  // For more information, see [Preemptible Virtual Machines](/docs/compute/concepts/preemptible-vm).
-  bool preemptible = 1;
-}
-
 message NodeGroupMaintenancePolicy {
+  // If set to true, automatic updates are installed in the specified period of time with no interaction from the user.
+  // If set to false, automatic upgrades are disabled.
   bool auto_upgrade = 1;
+
+  // If set to true, automatic repairs are enabled. Default value is false.
   bool auto_repair = 2;
 
+  // Maintenance window settings. Update will start at the specified time and last no more than the specified duration.
+  // The time is set in UTC.
   MaintenanceWindow maintenance_window = 3;
+}
+
+message DeployPolicy {
+  // The maximum number of running instances that can be taken offline (i.e.,
+  // stopped or deleted) at the same time during the update process.
+  // If [max_expansion] is not specified or set to zero, [max_unavailable] must
+  // be set to a non-zero value.
+  int64 max_unavailable = 1 [(value) = "0-100"];
+
+  // The maximum number of instances that can be temporarily allocated above
+  // the group's target size during the update process.
+  // If [max_unavailable] is not specified or set to zero, [max_expansion] must
+  // be set to a non-zero value.
+  int64 max_expansion = 2 [(value) = "0-100"];
 }

@@ -6,6 +6,7 @@ import "google/protobuf/timestamp.proto";
 import "google/type/timeofday.proto";
 import "yandex/cloud/mdb/mysql/v1/config/mysql5_7.proto";
 import "yandex/cloud/mdb/mysql/v1/config/mysql8_0.proto";
+import "yandex/cloud/mdb/mysql/v1/maintenance.proto";
 
 option go_package = "github.com/yandex-cloud/go-genproto/yandex/cloud/mdb/mysql/v1;mysql";
 option java_package = "yandex.cloud.api.mdb.mysql.v1";
@@ -105,6 +106,15 @@ message Cluster {
 
   // Current state of the cluster.
   Status status = 12;
+
+  // Window of maintenance operations.
+  MaintenanceWindow maintenance_window = 13;
+
+  // Maintenance operation planned at nearest maintenance_window.
+  MaintenanceOperation planned_operation = 14;
+
+  // User security groups
+  repeated string security_group_ids = 15;
 }
 
 message Monitoring {
@@ -125,9 +135,9 @@ message ClusterConfig {
   // Configuration for MySQL servers in the cluster.
   oneof mysql_config {
     // Configuration of a MySQL 5.7 server.
-    config.MysqlConfigSet5_7 mysql_config_5_7 = 2;
+    config.MysqlConfigSet5_7 mysql_config_5_7 = 2 [json_name="mysqlConfig_5_7"];
     // Configuration of a MySQL 8.0 server.
-    config.MysqlConfigSet8_0 mysql_config_8_0 = 6;
+    config.MysqlConfigSet8_0 mysql_config_8_0 = 6 [json_name="mysqlConfig_8_0"];
   }
 
   // Resources allocated to MySQL hosts.
@@ -250,4 +260,9 @@ message Resources {
 message Access {
   // Allow access for DataLens
   bool data_lens = 1;
+
+  // Allow SQL queries to the cluster databases from the Yandex.Cloud management console.
+  //
+  // See [SQL queries in the management console](/docs/managed-mysql/operations/web-sql-query) for more details.
+  bool web_sql = 2;
 }
