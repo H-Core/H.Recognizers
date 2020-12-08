@@ -6,27 +6,13 @@
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet">
-    <Version>0.9.4</Version>
+    <Version>0.9.4.1</Version>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Description></Description>
     <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
   </PropertyGroup>
 
-  <PropertyGroup Label="Protobuf Generation">
-    <DisableProtobufDesignTimeBuild>true</DisableProtobufDesignTimeBuild>
-    <Protobuf_NoWarnMissingExpected>true</Protobuf_NoWarnMissingExpected>
-    <ProtoOutputDir>generated</ProtoOutputDir>
-    <CompileProtoOutputs>false</CompileProtoOutputs>
-    <CompileProtoOutputs Condition="!Exists('$(ProtoOutputDir)')">true</CompileProtoOutputs>
-  </PropertyGroup>
-
   <ItemGroup>
-    <PackageReference Include="Grpc" Version="2.34.0" />
-    <PackageReference Include="Google.Protobuf" Version="3.14.0" />
-    <PackageReference Include="Grpc.Tools" Version="2.34.0">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="H.Core" Version="0.9.4" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
@@ -37,16 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Protobuf Include="cloudapi/**/*.proto" ProtoRoot="cloudapi/third_party/googleapis;cloudapi" Access="internal" OutputDir="$(ProtoOutputDir)/%(RelativeDir)" GrpcServices="none" CompileOutputs="$(CompileProtoOutputs)" />
-    <Protobuf Update="cloudapi/**/*_service.proto" GrpcServices="Client" CompileOutputs="$(CompileProtoOutputs)" />
+    <ProjectReference Include="..\H.Yandex.Cloud.SDK\H.Yandex.Cloud.SDK.csproj" />
   </ItemGroup>
-
-  <Target Name="Generate" BeforeTargets="BeforeBuild" Condition="!Exists('$(ProtoOutputDir)')">
-    <MSBuild Projects="$(MSBuildProjectFile)" Properties="DisableProtobufDesignTimeBuild=false" Targets="Protobuf_Compile" UnloadProjectsOnCompletion="true" />
-  </Target>
-
-  <Target Name="CleanGenerated" BeforeTargets="BeforeClean" Condition="Exists('$(ProtoOutputDir)')">
-    <RemoveDir Directories="$(ProtoOutputDir)" />
-  </Target>
 
 </Project>
