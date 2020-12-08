@@ -3,6 +3,7 @@
   <PropertyGroup>
     <TargetFrameworks>net5.0;net4.8</TargetFrameworks>
     <RootNamespace>H.Converters.IntegrationTests</RootNamespace>
+    <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
   <ItemGroup Label="Test Files">
