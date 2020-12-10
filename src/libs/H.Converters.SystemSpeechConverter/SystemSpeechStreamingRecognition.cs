@@ -6,6 +6,9 @@ using Microsoft.Speech.Recognition;
 
 namespace H.Converters
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public sealed class SystemSpeechStreamingRecognition : StreamingRecognition
     {
         #region Properties
@@ -30,11 +33,22 @@ namespace H.Converters
 
         #region Public methods
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public override Task WriteAsync(byte[] bytes, CancellationToken cancellationToken = default)
         {
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public override Task StopAsync(CancellationToken cancellationToken = default)
         {
             SpeechRecognitionEngine.RecognizeAsyncStop();

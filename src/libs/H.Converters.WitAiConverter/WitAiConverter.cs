@@ -3,24 +3,32 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using H.Core;
 using H.Core.Converters;
 using Newtonsoft.Json;
 
 namespace H.Converters
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public sealed class WitAiConverter : Converter, IConverter
     {
         #region Properties
 
         bool IConverter.IsStreamingRecognitionSupported => true;
 
+        /// <summary>
+        /// 
+        /// </summary>
         public string Token { get; set; } = string.Empty;
 
         #endregion
 
         #region Constructors
 
+        /// <summary>
+        /// 
+        /// </summary>
         public WitAiConverter()
         {
             AddSetting(nameof(Token), o => Token = o, NoEmpty, string.Empty);
@@ -30,11 +38,22 @@ namespace H.Converters
 
         #region Public methods
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public override Task<IStreamingRecognition> StartStreamingRecognitionAsync(CancellationToken cancellationToken = default)
         {
             return Task.FromResult<IStreamingRecognition>(new WitAiStreamingRecognition(Token));
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public override async Task<string> ConvertAsync(byte[] bytes, CancellationToken cancellationToken = default)
         {
             using var client = new HttpClient();

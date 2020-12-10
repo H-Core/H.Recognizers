@@ -7,9 +7,8 @@
 
   <PropertyGroup Label="NuGet">
     <Version>0.9.5</Version>
-    <GenerateDocumentationFile>false</GenerateDocumentationFile>
     <Description></Description>
-    <PackageReleaseNotes>Initial release.</PackageReleaseNotes>
+    <PackageReleaseNotes></PackageReleaseNotes>
   </PropertyGroup>
 
   <ItemGroup>

@@ -9,6 +9,9 @@ using Newtonsoft.Json;
 
 namespace H.Converters
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public sealed class WitAiStreamingRecognitionWebRequest : StreamingRecognition
     {
         #region Properties
@@ -70,6 +73,12 @@ namespace H.Converters
 
         #region Public methods
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public override Task WriteAsync(byte[] bytes, CancellationToken cancellationToken = default)
         {
             WriteQueue.Enqueue(bytes);
@@ -77,6 +86,11 @@ namespace H.Converters
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="cancellationToken"></param>
+        /// <returns></returns>
         public override async Task StopAsync(CancellationToken cancellationToken = default)
         {
             IsStopped = true;
@@ -110,6 +124,10 @@ namespace H.Converters
             OnFinalResultsReceived(obj.Text ?? string.Empty);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="disposing"></param>
         protected override void Dispose(bool disposing)
         {
             if (IsDisposed)
