@@ -107,7 +107,7 @@ namespace H.Converters
 
             var obj = JsonConvert.DeserializeObject<WitAiResponse>(json);
 
-            OnAfterFinalResults(obj.Text ?? string.Empty);
+            OnFinalResultsReceived(obj.Text ?? string.Empty);
         }
 
         protected override void Dispose(bool disposing)

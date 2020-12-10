@@ -20,8 +20,8 @@ namespace H.Converters
         {
             SpeechRecognitionEngine = speechRecognitionEngine ?? throw new ArgumentNullException(nameof(speechRecognitionEngine));
 
-            SpeechRecognitionEngine.SpeechHypothesized += (_, args) => OnAfterPartialResults(args.Result.Text);
-            SpeechRecognitionEngine.SpeechRecognized += (_, args) => OnAfterFinalResults(args.Result.Text);
+            SpeechRecognitionEngine.SpeechHypothesized += (_, args) => OnPartialResultsReceived(args.Result.Text);
+            SpeechRecognitionEngine.SpeechRecognized += (_, args) => OnFinalResultsReceived(args.Result.Text);
 
             SpeechRecognitionEngine.RecognizeAsync(RecognizeMode.Multiple);
         }

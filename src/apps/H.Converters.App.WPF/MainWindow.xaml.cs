@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using H.Core;
+using H.Core.Converters;
 using H.Recorders;
 
 namespace H.Converters.App.WPF
@@ -54,36 +54,31 @@ namespace H.Converters.App.WPF
                 };
 
                 using var recognition = await converter.StartStreamingRecognitionAsync().ConfigureAwait(false);
-                recognition.AfterPartialResults += (_, args) => Dispatcher?.Invoke(() =>
+                recognition.PartialResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
                 {
-                    OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} {args.Text}{Environment.NewLine}";
-                    OutputTextBlock.Text = $"{DateTime.Now:h:mm:ss.fff} {args.Text}";
+                    OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} {value}{Environment.NewLine}";
+                    OutputTextBlock.Text = $"{DateTime.Now:h:mm:ss.fff} {value}";
                 });
-                recognition.AfterFinalResults += (_, args) => Dispatcher?.Invoke(() =>
+                recognition.FinalResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
                 {
-                    OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} {args.Text}{Environment.NewLine}";
-                    OutputTextBlock.Text = $"{DateTime.Now:h:mm:ss.fff} {args.Text}";
+                    OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} {value}{Environment.NewLine}";
+                    OutputTextBlock.Text = $"{DateTime.Now:h:mm:ss.fff} {value}";
                 });
 
-                if (recorder.RawData != null)
+                if (recorder.RawData.Any())
                 {
-                    await recognition.WriteAsync(recorder.RawData.ToArray()).ConfigureAwait(false);
+                    await recognition.WriteAsync(recorder.RawData).ConfigureAwait(false);
                 }
 
                 // ReSharper disable once AccessToDisposedClosure
-                recorder.RawDataReceived += async (_, args) =>
+                recorder.RawDataReceived += async (_, bytes) =>
                 {
-                    if (args.RawData == null)
-                    {
-                        return;
-                    }
-
-                    await recognition.WriteAsync(args.RawData.ToArray()).ConfigureAwait(false);
+                    await recognition.WriteAsync(bytes).ConfigureAwait(false);
                 };
 
-                await Task.Delay(TimeSpan.FromMilliseconds(5000)).ConfigureAwait(false);
+                await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
 
-                await recorder.StopAsync();
+                await recorder.StopAsync().ConfigureAwait(false);
                 await recognition.StopAsync().ConfigureAwait(false);
             }
             catch (Exception exception)

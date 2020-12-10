@@ -16,8 +16,8 @@ namespace H.Converters.IntegrationTests
             using var converter = new SystemSpeechConverter();
 
             using var recognition = await converter.StartStreamingRecognitionAsync();
-            recognition.AfterPartialResults += (sender, args) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterPartialResults: {args.Text}");
-            recognition.AfterFinalResults += (sender, args) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterFinalResults: {args.Text}");
+            recognition.PartialResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} PartialResultsReceived: {value}");
+            recognition.FinalResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} FinalResultsReceived: {value}");
 
             await Task.Delay(TimeSpan.FromSeconds(5));
 

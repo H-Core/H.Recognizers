@@ -1,5 +1,6 @@
 using System.Threading.Tasks;
-using H.Core;
+using H.Core.Converters;
+using H.Core.Recorders;
 using H.Recorders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 

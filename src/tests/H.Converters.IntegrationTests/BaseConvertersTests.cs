@@ -3,6 +3,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using H.NET.Converters.IntegrationTests.Utilities;
 using H.Core;
+using H.Core.Converters;
+using H.Core.Recorders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace H.Converters.IntegrationTests
@@ -12,12 +14,12 @@ namespace H.Converters.IntegrationTests
         public static async Task StartStreamingRecognitionTest(IConverter converter, string name, string expected, int bytesPerWrite = 8000)
         {
             using var recognition = await converter.StartStreamingRecognitionAsync();
-            recognition.AfterPartialResults += (_, args) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterPartialResults: {args.Text}");
-            recognition.AfterFinalResults += (_, args) =>
+            recognition.PartialResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterPartialResults: {value}");
+            recognition.FinalResultsReceived += (_, value) =>
             {
-                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterFinalResults: {args.Text}");
+                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterFinalResults: {value}");
 
-                Assert.AreEqual(expected, args.Text);
+                Assert.AreEqual(expected, value);
             };
 
             var bytes = ResourcesUtilities.ReadFileAsBytes(name);
@@ -39,29 +41,22 @@ namespace H.Converters.IntegrationTests
             await recorder.StartAsync();
 
             using var recognition = await converter.StartStreamingRecognitionAsync();
-            recognition.AfterPartialResults += (_, args) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterPartialResults: {args.Text}");
-            recognition.AfterFinalResults += (_, args) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterFinalResults: {args.Text}");
+            recognition.PartialResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterPartialResults: {value}");
+            recognition.FinalResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterFinalResults: {value}");
 
             if (writeWavHeader)
             {
-                var wavHeader = recorder.WavHeader?.ToArray() ??
-                                     throw new InvalidOperationException("Recorder Wav Header is null");
-                await recognition.WriteAsync(wavHeader);
+                await recognition.WriteAsync(recorder.WavHeader);
             }
-            if (recorder.RawData != null)
+            if (recorder.RawData.Any())
             {
-                await recognition.WriteAsync(recorder.RawData.ToArray());
+                await recognition.WriteAsync(recorder.RawData);
             }
 
             // ReSharper disable once AccessToDisposedClosure
-            recorder.RawDataReceived += async (_, args) =>
+            recorder.RawDataReceived += async (_, bytes) =>
             {
-                if (args.RawData == null)
-                {
-                    return;
-                }
-
-                await recognition.WriteAsync(args.RawData.ToArray());
+                await recognition.WriteAsync(bytes);
             };
 
             await Task.Delay(TimeSpan.FromMilliseconds(5000));
@@ -89,12 +84,8 @@ namespace H.Converters.IntegrationTests
 
             var bytes = recorder.WavData;
             Assert.IsNotNull(bytes, $"{nameof(bytes)} == null");
-            if (bytes == null)
-            {
-                return;
-            }
 
-            var result = await converter.ConvertAsync(bytes.ToArray());
+            var result = await converter.ConvertAsync(bytes);
 
             Console.WriteLine(result);
         }

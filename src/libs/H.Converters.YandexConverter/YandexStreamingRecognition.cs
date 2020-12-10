@@ -52,11 +52,11 @@ namespace H.Converters
                         if (chunk.Final)
                         {
                             IsFinished = true;
-                            OnAfterFinalResults(text);
+                            OnFinalResultsReceived(text);
                         }
                         else
                         {
-                            OnAfterPartialResults(text);
+                            OnPartialResultsReceived(text);
                         }
                     }
 
