@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using H.Core.Converters;
+using H.Core.Utilities;
 using H.Recorders;
 
 namespace H.Converters.App.WPF
@@ -28,21 +29,12 @@ namespace H.Converters.App.WPF
 
             try
             {
-                using var recorder = ConverterComboBox.Text switch
-                {
-                    nameof(WitAiConverter) => new NAudioRecorder(),
-                    nameof(YandexConverter) => new NAudioRecorder(),
-                    _ => throw new NotImplementedException()
-                };
-                await recorder.InitializeAsync();
-                await recorder.StartAsync();
-
+                using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+                var cancellationToken = cancellationTokenSource.Token;
+                
+                using var recorder = new NAudioRecorder();
                 using var converter = ConverterComboBox.Text switch
                 {
-                    nameof(WitAiConverter) => (IConverter)new WitAiConverter
-                    {
-                        Token = !string.IsNullOrWhiteSpace(OAuthTokenTextBox.Text) ? OAuthTokenTextBox.Text : "KATWBG4RQCFNBLQTY6QQUKB2SH6EIELG",
-                    },
                     nameof(YandexConverter) => new YandexConverter
                     {
                         OAuthToken = OAuthTokenTextBox.Text,
@@ -50,40 +42,33 @@ namespace H.Converters.App.WPF
                         Lang = "ru-RU",
                         SampleRateHertz = 8000,
                     },
-                    _ => throw new NotImplementedException(),
+                    nameof(WitAiConverter) or _ => (IConverter)new WitAiConverter
+                    {
+                        Token = !string.IsNullOrWhiteSpace(OAuthTokenTextBox.Text)
+                            ? OAuthTokenTextBox.Text
+                            : "KATWBG4RQCFNBLQTY6QQUKB2SH6EIELG",
+                    },
                 };
+                var exceptions = new ExceptionsBag();
+                exceptions.ExceptionOccurred += (_, exception) => OnException(exception);
 
-                using var recognition = await converter.StartStreamingRecognitionAsync().ConfigureAwait(false);
+                using var recognition = await converter.StartStreamingRecognitionAsync(recorder, false, exceptions, cancellationToken).ConfigureAwait(false);
                 recognition.PartialResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
                 {
-                    OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} {value}{Environment.NewLine}";
-                    OutputTextBlock.Text = $"{DateTime.Now:h:mm:ss.fff} {value}";
+                    OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Partial: {value}{Environment.NewLine}";
                 });
                 recognition.FinalResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
                 {
-                    OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} {value}{Environment.NewLine}";
-                    OutputTextBlock.Text = $"{DateTime.Now:h:mm:ss.fff} {value}";
+                    OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Final: {value}{Environment.NewLine}";
                 });
 
-                if (recorder.RawData.Any())
-                {
-                    await recognition.WriteAsync(recorder.RawData).ConfigureAwait(false);
-                }
+                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
 
-                // ReSharper disable once AccessToDisposedClosure
-                recorder.RawDataReceived += async (_, bytes) =>
-                {
-                    await recognition.WriteAsync(bytes).ConfigureAwait(false);
-                };
-
-                await Task.Delay(TimeSpan.FromSeconds(5)).ConfigureAwait(false);
-
-                await recorder.StopAsync().ConfigureAwait(false);
-                await recognition.StopAsync().ConfigureAwait(false);
+                await recognition.StopAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
-                MessageBox.Show(exception.ToString());
+                OnException(exception);
             }
 
             Dispatcher?.Invoke(() =>
@@ -91,6 +76,11 @@ namespace H.Converters.App.WPF
                 ProcessButton.IsEnabled = true;
                 OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Ended {Environment.NewLine}";
             });
+        }
+
+        private static void OnException(Exception exception)
+        {
+            MessageBox.Show(exception.ToString());
         }
     }
 }

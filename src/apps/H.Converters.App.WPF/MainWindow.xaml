@@ -10,14 +10,7 @@
             <ColumnDefinition Width="60*"></ColumnDefinition>
             <ColumnDefinition Width="40*"></ColumnDefinition>
         </Grid.ColumnDefinitions>
-        <Grid Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="30"></RowDefinition>
-                <RowDefinition Height="*"></RowDefinition>
-            </Grid.RowDefinitions>
-            <TextBlock Grid.Row="0" x:Name="OutputTextBlock"/>
-            <TextBox Grid.Row="1" x:Name="OutputTextBox" TextWrapping="Wrap" AcceptsReturn="True"/>
-        </Grid>
+        <TextBox Grid.Column="0" x:Name="OutputTextBox" TextWrapping="Wrap" AcceptsReturn="True"/>
         <Grid Grid.Column="1">
             <Grid.RowDefinitions>
                 <RowDefinition Height="30"></RowDefinition>
