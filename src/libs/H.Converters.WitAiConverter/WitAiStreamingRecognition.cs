@@ -23,7 +23,7 @@ namespace H.Converters
         private HttpRequestMessage HttpRequestMessage { get; }
         private Task<HttpResponseMessage> SendTask { get; }
 
-        private ConcurrentQueue<byte[]> WriteQueue { get; } = new ConcurrentQueue<byte[]>();
+        private ConcurrentQueue<byte[]> WriteQueue { get; } = new ();
         private bool IsStopped { get; set; }
         private bool IsFinished { get; set; }
 
@@ -134,7 +134,6 @@ namespace H.Converters
             {
                 HttpClient.Dispose();
                 HttpRequestMessage.Dispose();
-                SendTask.Dispose();
             }
 
             base.Dispose(disposing);
