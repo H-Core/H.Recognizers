@@ -1,10 +1,11 @@
 using System;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using H.NET.Converters.IntegrationTests.Utilities;
-using H.Core;
 using H.Core.Converters;
 using H.Core.Recorders;
+using H.Core.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace H.Converters.IntegrationTests
@@ -35,34 +36,28 @@ namespace H.Converters.IntegrationTests
             await recognition.StopAsync();
         }
 
-        public static async Task StartStreamingRecognitionTest_RealTime(IRecorder recorder, IConverter converter, bool writeWavHeader = false)
+        public static async Task<ExceptionsBag> StartStreamingRecognitionTest_RealTimeAsync(
+            IRecorder recorder, 
+            IConverter converter, 
+            bool writeWavHeader = false,
+            CancellationToken cancellationToken = default)
         {
-            await recorder.InitializeAsync();
-            await recorder.StartAsync();
-
-            using var recognition = await converter.StartStreamingRecognitionAsync();
-            recognition.PartialResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterPartialResults: {value}");
-            recognition.FinalResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterFinalResults: {value}");
-
-            if (writeWavHeader)
+            var exceptions = new ExceptionsBag();
+            using var recognition = await converter.StartStreamingRecognitionAsync(recorder, writeWavHeader, exceptions, cancellationToken);
+            recognition.PartialResultsReceived += (_, value) =>
             {
-                await recognition.WriteAsync(recorder.WavHeader);
-            }
-            if (recorder.RawData.Any())
+                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.PartialResultsReceived)}: {value}");
+            };
+            recognition.FinalResultsReceived += (_, value) =>
             {
-                await recognition.WriteAsync(recorder.RawData);
-            }
-
-            // ReSharper disable once AccessToDisposedClosure
-            recorder.RawDataReceived += async (_, bytes) =>
-            {
-                await recognition.WriteAsync(bytes);
+                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.FinalResultsReceived)}: {value}");
             };
 
-            await Task.Delay(TimeSpan.FromMilliseconds(5000));
+            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);
 
-            await recorder.StopAsync();
-            await recognition.StopAsync();
+            await recognition.StopAsync(cancellationToken);
+
+            return exceptions;
         }
 
         public static async Task ConvertTest(IConverter converter, string name, string expected)
@@ -75,10 +70,9 @@ namespace H.Converters.IntegrationTests
 
         public static async Task ConvertTest_RealTime(IRecorder recorder, IConverter converter)
         {
-            await recorder.InitializeAsync();
             await recorder.StartAsync();
 
-            await Task.Delay(TimeSpan.FromMilliseconds(5000));
+            await Task.Delay(TimeSpan.FromSeconds(5));
 
             await recorder.StopAsync();
 

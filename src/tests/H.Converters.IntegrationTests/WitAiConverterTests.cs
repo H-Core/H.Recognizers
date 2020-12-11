@@ -7,7 +7,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace H.Converters.IntegrationTests
 {
     [TestClass]
-    [Ignore]
     public class WitAiConverterTests
     {
         public static IRecorder CreateRecorder() => new NAudioRecorder();
@@ -25,12 +24,14 @@ namespace H.Converters.IntegrationTests
         }
 
         [TestMethod]
+        [Ignore]
         public async Task StartStreamingRecognitionTest_RealTime()
         {
             using var recorder = CreateRecorder();
             using var converter = CreateConverter();
 
-            await BaseConvertersTests.StartStreamingRecognitionTest_RealTime(recorder, converter, true);
+            var exceptions = await BaseConvertersTests.StartStreamingRecognitionTest_RealTimeAsync(recorder, converter, true);
+            exceptions.EnsureNoExceptions();
         }
 
         [TestMethod]
@@ -42,6 +43,7 @@ namespace H.Converters.IntegrationTests
         }
 
         [TestMethod]
+        [Ignore]
         public async Task ConvertTest_RealTime()
         {
             using var recorder = CreateRecorder();

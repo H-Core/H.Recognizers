@@ -37,7 +37,8 @@ namespace H.Converters.IntegrationTests
             using var recorder = CreateRecorder();
             using var converter = CreateConverter();
 
-            await BaseConvertersTests.StartStreamingRecognitionTest_RealTime(recorder, converter);
+            var exceptions = await BaseConvertersTests.StartStreamingRecognitionTest_RealTimeAsync(recorder, converter);
+            exceptions.EnsureNoExceptions();
         }
 
         [TestMethod]
