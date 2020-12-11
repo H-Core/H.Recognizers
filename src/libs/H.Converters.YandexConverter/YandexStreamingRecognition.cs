@@ -106,11 +106,15 @@ namespace H.Converters
         /// <returns></returns>
         public override async Task StopAsync(CancellationToken cancellationToken = default)
         {
+            OnStopping();
+
             await WriteTask.ConfigureAwait(false);
 
             await Call.RequestStream.CompleteAsync().ConfigureAwait(false);
 
             await ReceiveTask.ConfigureAwait(false);
+            
+            OnStopped();
         }
 
         /// <summary>

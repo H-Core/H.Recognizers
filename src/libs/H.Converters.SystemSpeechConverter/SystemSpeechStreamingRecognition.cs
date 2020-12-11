@@ -51,8 +51,12 @@ namespace H.Converters
         /// <returns></returns>
         public override Task StopAsync(CancellationToken cancellationToken = default)
         {
+            OnStopping();
+            
             SpeechRecognitionEngine.RecognizeAsyncStop();
 
+            OnStopped();
+            
             return Task.CompletedTask;
         }
 

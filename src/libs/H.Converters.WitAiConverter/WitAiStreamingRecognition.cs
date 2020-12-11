@@ -94,8 +94,10 @@ namespace H.Converters
         /// <returns></returns>
         public override async Task StopAsync(CancellationToken cancellationToken = default)
         {
-            IsStopped = true;
+            OnStopping();
 
+            IsStopped = true;
+            
             while (!IsFinished)
             {
                 await Task.Delay(TimeSpan.FromMilliseconds(1), cancellationToken).ConfigureAwait(false);
@@ -113,6 +115,8 @@ namespace H.Converters
             var obj = JsonConvert.DeserializeObject<WitAiResponse>(json);
 
             OnFinalResultsReceived(obj.Text ?? string.Empty);
+            
+            OnStopped();
         }
 
         /// <summary>
