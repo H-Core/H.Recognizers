@@ -28,7 +28,7 @@ namespace H.Converters.IntegrationTests
         {
             using var converter = CreateConverter();
 
-            await BaseConvertersTests.StartStreamingRecognitionTest(converter, "проверка_проверка_8000.wav", "проверка");
+            await BaseConvertersTests.StartStreamingRecognitionTest(converter, "test_test_rus_8000.wav", "проверка");
         }
 
         [TestMethod]
@@ -46,7 +46,7 @@ namespace H.Converters.IntegrationTests
         {
             using var converter = CreateConverter();
 
-            await BaseConvertersTests.ConvertTest(converter, "проверка_проверка_8000.wav", "проверка проверка");
+            await BaseConvertersTests.ConvertTest(converter, "test_test_rus_8000.wav", "проверка проверка");
         }
 
         [TestMethod]

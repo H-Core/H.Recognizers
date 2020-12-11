@@ -7,12 +7,11 @@
   </PropertyGroup>
 
   <ItemGroup Label="Test Files">
-    <None Remove="TestFiles\RawSpeech\speech1.wav" />
-    <None Remove="TestFiles\RawSpeech\проверка_проверка_8000.wav" />
-    <EmbeddedResource Include="TestFiles\RawSpeech\проверка_проверка_8000.wav" />
+    <EmbeddedResource Include="TestFiles\**" />
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="H.IO" Version="1.0.1" />
     <PackageReference Include="H.Recorders.NAudioRecorder" Version="0.9.5.2" />
   </ItemGroup>
 
