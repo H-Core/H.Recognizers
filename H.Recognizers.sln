@@ -20,11 +20,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.SystemSpeechConverter", "src\libs\H.Recognizers.SystemSpeechConverter\H.Recognizers.SystemSpeechConverter.csproj", "{82BAF374-B000-455F-BD7B-939DFD3E25EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.SystemSpeechRecognizer", "src\libs\H.Recognizers.SystemSpeechRecognizer\H.Recognizers.SystemSpeechRecognizer.csproj", "{82BAF374-B000-455F-BD7B-939DFD3E25EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.WitAiConverter", "src\libs\H.Recognizers.WitAiConverter\H.Recognizers.WitAiConverter.csproj", "{DC8B6793-A390-43AF-9827-A8B09F915266}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.WitAiRecognizer", "src\libs\H.Recognizers.WitAiRecognizer\H.Recognizers.WitAiRecognizer.csproj", "{DC8B6793-A390-43AF-9827-A8B09F915266}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.YandexConverter", "src\libs\H.Recognizers.YandexConverter\H.Recognizers.YandexConverter.csproj", "{29FAC41C-8FEE-4530-9614-2430C1E720CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.YandexRecognizer", "src\libs\H.Recognizers.YandexRecognizer\H.Recognizers.YandexRecognizer.csproj", "{29FAC41C-8FEE-4530-9614-2430C1E720CD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{7634572A-102D-4FB4-B0BE-FA1C5FAE65D3}"
 EndProject
