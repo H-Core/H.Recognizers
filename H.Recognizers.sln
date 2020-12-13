@@ -20,17 +20,17 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Converters.SystemSpeechConverter", "src\libs\H.Converters.SystemSpeechConverter\H.Converters.SystemSpeechConverter.csproj", "{82BAF374-B000-455F-BD7B-939DFD3E25EC}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.SystemSpeechConverter", "src\libs\H.Recognizers.SystemSpeechConverter\H.Recognizers.SystemSpeechConverter.csproj", "{82BAF374-B000-455F-BD7B-939DFD3E25EC}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Converters.WitAiConverter", "src\libs\H.Converters.WitAiConverter\H.Converters.WitAiConverter.csproj", "{DC8B6793-A390-43AF-9827-A8B09F915266}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.WitAiConverter", "src\libs\H.Recognizers.WitAiConverter\H.Recognizers.WitAiConverter.csproj", "{DC8B6793-A390-43AF-9827-A8B09F915266}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Converters.YandexConverter", "src\libs\H.Converters.YandexConverter\H.Converters.YandexConverter.csproj", "{29FAC41C-8FEE-4530-9614-2430C1E720CD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.YandexConverter", "src\libs\H.Recognizers.YandexConverter\H.Recognizers.YandexConverter.csproj", "{29FAC41C-8FEE-4530-9614-2430C1E720CD}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "apps", "apps", "{7634572A-102D-4FB4-B0BE-FA1C5FAE65D3}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Converters.App.WPF", "src\apps\H.Converters.App.WPF\H.Converters.App.WPF.csproj", "{CE65EEA0-75F2-4DE5-A1C3-3C13DC796270}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.App.WPF", "src\apps\H.Recognizers.App.WPF\H.Recognizers.App.WPF.csproj", "{CE65EEA0-75F2-4DE5-A1C3-3C13DC796270}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Converters.IntegrationTests", "src\tests\H.Converters.IntegrationTests\H.Converters.IntegrationTests.csproj", "{27FCF9DB-E131-4916-901E-F59EADE6947C}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Recognizers.IntegrationTests", "src\tests\H.Recognizers.IntegrationTests\H.Recognizers.IntegrationTests.csproj", "{27FCF9DB-E131-4916-901E-F59EADE6947C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "H.Yandex.Cloud.SDK", "src\libs\H.Yandex.Cloud.SDK\H.Yandex.Cloud.SDK.csproj", "{F8801A29-4F0C-4B62-9157-30C37EB18FEA}"
 EndProject

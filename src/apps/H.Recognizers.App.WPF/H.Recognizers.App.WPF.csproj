@@ -12,8 +12,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\H.Converters.WitAiConverter\H.Converters.WitAiConverter.csproj" />
-    <ProjectReference Include="..\..\libs\H.Converters.YandexConverter\H.Converters.YandexConverter.csproj" />
+    <ProjectReference Include="..\..\libs\H.Recognizers.WitAiConverter\H.Recognizers.WitAiConverter.csproj" />
+    <ProjectReference Include="..\..\libs\H.Recognizers.YandexConverter\H.Recognizers.YandexConverter.csproj" />
   </ItemGroup>
 
 </Project>
