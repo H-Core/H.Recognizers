@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using H.Core.Recognizers;
 using Newtonsoft.Json;
 
-namespace H.Converters
+namespace H.Recognizers
 {
     /// <summary>
     /// 

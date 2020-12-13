@@ -4,11 +4,11 @@ using H.Core.Recorders;
 using H.Recorders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.Converters.IntegrationTests
+namespace H.Recognizers.IntegrationTests
 {
     [TestClass]
     [Ignore]
-    public class YandexConverterTests
+    public class YandexRecognizerTests
     {
         public const string FolderId = "$FolderId$";
         public const string OAuthToken = "$OAuthToken$";
@@ -28,7 +28,7 @@ namespace H.Converters.IntegrationTests
         {
             using var recognizer = CreateRecognizer();
 
-            await BaseConvertersTests.StartStreamingRecognitionTest(recognizer, "test_test_rus_8000.wav", "проверка");
+            await BaseTests.StartStreamingRecognitionTest(recognizer, "test_test_rus_8000.wav", "проверка");
         }
 
         [TestMethod]
@@ -37,7 +37,7 @@ namespace H.Converters.IntegrationTests
             using var recorder = CreateRecorder();
             using var recognizer = CreateRecognizer();
 
-            var exceptions = await BaseConvertersTests.StartStreamingRecognitionTest_RealTimeAsync(recorder, recognizer);
+            var exceptions = await BaseTests.StartStreamingRecognitionTest_RealTimeAsync(recorder, recognizer);
             exceptions.EnsureNoExceptions();
         }
 
@@ -46,7 +46,7 @@ namespace H.Converters.IntegrationTests
         {
             using var recognizer = CreateRecognizer();
 
-            await BaseConvertersTests.ConvertTest(recognizer, "test_test_rus_8000.wav", "проверка проверка");
+            await BaseTests.ConvertTest(recognizer, "test_test_rus_8000.wav", "проверка проверка");
         }
 
         [TestMethod]
@@ -55,7 +55,7 @@ namespace H.Converters.IntegrationTests
             using var recorder = CreateRecorder();
             using var recognizer = CreateRecognizer();
 
-            await BaseConvertersTests.ConvertTest_RealTime(recorder, recognizer);
+            await BaseTests.ConvertTest_RealTime(recorder, recognizer);
         }
     }
 }

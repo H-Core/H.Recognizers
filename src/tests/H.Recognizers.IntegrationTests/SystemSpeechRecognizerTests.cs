@@ -3,19 +3,19 @@ using System;
 using System.Threading.Tasks;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.Converters.IntegrationTests
+namespace H.Recognizers.IntegrationTests
 {
 
     [TestClass]
     [Ignore]
-    public class SystemSpeechConverterTests
+    public class SystemSpeechRecognizerTests
     {
         [TestMethod]
         public async Task StartStreamingRecognitionTest_RealTime()
         {
-            using var converter = new SystemSpeechRecognizer();
+            using var recognizer = new SystemSpeechRecognizer();
 
-            using var recognition = await converter.StartStreamingRecognitionAsync();
+            using var recognition = await recognizer.StartStreamingRecognitionAsync();
             recognition.PartialResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} PartialResultsReceived: {value}");
             recognition.FinalResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} FinalResultsReceived: {value}");
 

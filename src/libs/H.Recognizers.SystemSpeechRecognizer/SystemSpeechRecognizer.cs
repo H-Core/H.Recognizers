@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using H.Core.Recognizers;
 using Microsoft.Speech.Recognition;
 
-namespace H.Converters
+namespace H.Recognizers
 {
     /// <summary>
     /// 

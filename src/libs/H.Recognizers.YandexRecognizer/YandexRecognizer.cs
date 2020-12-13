@@ -5,12 +5,12 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
-using H.Converters.Utilities;
 using H.Core.Recognizers;
+using H.Recognizers.Utilities;
 using Newtonsoft.Json;
 using Yandex.Cloud.Ai.Stt.V2;
 
-namespace H.Converters
+namespace H.Recognizers
 {
     /// <summary>
     /// 

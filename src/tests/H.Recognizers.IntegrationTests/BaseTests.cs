@@ -8,9 +8,9 @@ using H.Core.Utilities;
 using H.IO.Utilities;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.Converters.IntegrationTests
+namespace H.Recognizers.IntegrationTests
 {
-    public static class BaseConvertersTests
+    public static class BaseTests
     {
         public static async Task StartStreamingRecognitionTest(IRecognizer recognizer, string name, string expected, int bytesPerWrite = 8000)
         {

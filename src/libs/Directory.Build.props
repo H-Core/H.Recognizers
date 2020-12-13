@@ -13,8 +13,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>havendv</Authors>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageProjectUrl>https://github.com/HavenDV/H.Converters</PackageProjectUrl>
-    <RepositoryUrl>https://github.com/HavenDV/H.Converters</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/HavenDV/H.Recognizers</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/HavenDV/H.Recognizers</RepositoryUrl>
     <PackageIcon>nuget_icon.png</PackageIcon>
   </PropertyGroup>
 

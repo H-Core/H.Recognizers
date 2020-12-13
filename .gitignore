@@ -349,5 +349,4 @@ MigrationBackup/
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
 
-/src/libs/H.Converters.YandexConverter/generated/
 /src/libs/H.Yandex.Cloud.SDK/generated/

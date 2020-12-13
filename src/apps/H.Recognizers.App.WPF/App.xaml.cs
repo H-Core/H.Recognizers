@@ -1,4 +1,4 @@
-﻿namespace H.Converters.App.WPF
+﻿namespace H.Recognizers.App.WPF
 {
     public partial class App
     {

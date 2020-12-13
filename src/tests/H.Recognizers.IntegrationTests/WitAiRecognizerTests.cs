@@ -4,10 +4,10 @@ using H.Core.Recorders;
 using H.Recorders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
-namespace H.Converters.IntegrationTests
+namespace H.Recognizers.IntegrationTests
 {
     [TestClass]
-    public class WitAiConverterTests
+    public class WitAiRecognizerTests
     {
         public static IRecorder CreateRecorder() => new NAudioRecorder();
         public static IRecognizer CreateRecognizer() => new WitAiRecognizer
@@ -20,7 +20,7 @@ namespace H.Converters.IntegrationTests
         {
             using var recognizer = CreateRecognizer();
 
-            await BaseConvertersTests.StartStreamingRecognitionTest(recognizer, "test_test_rus_8000.wav", "проверка");
+            await BaseTests.StartStreamingRecognitionTest(recognizer, "test_test_rus_8000.wav", "проверка");
         }
 
         [TestMethod]
@@ -30,7 +30,7 @@ namespace H.Converters.IntegrationTests
             using var recorder = CreateRecorder();
             using var recognizer = CreateRecognizer();
 
-            var exceptions = await BaseConvertersTests.StartStreamingRecognitionTest_RealTimeAsync(recorder, recognizer, true);
+            var exceptions = await BaseTests.StartStreamingRecognitionTest_RealTimeAsync(recorder, recognizer, true);
             exceptions.EnsureNoExceptions();
         }
 
@@ -39,7 +39,7 @@ namespace H.Converters.IntegrationTests
         {
             using var recognizer = CreateRecognizer();
 
-            await BaseConvertersTests.ConvertTest(recognizer, "test_test_rus_8000.wav", "проверка");
+            await BaseTests.ConvertTest(recognizer, "test_test_rus_8000.wav", "проверка");
         }
 
         [TestMethod]
@@ -49,7 +49,7 @@ namespace H.Converters.IntegrationTests
             using var recorder = CreateRecorder();
             using var recognizer = CreateRecognizer();
 
-            await BaseConvertersTests.ConvertTest_RealTime(recorder, recognizer);
+            await BaseTests.ConvertTest_RealTime(recorder, recognizer);
         }
     }
 }

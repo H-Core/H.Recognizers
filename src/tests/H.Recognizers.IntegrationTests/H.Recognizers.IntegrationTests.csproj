@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <TargetFrameworks>net5.0;net4.8</TargetFrameworks>
-    <RootNamespace>H.Converters.IntegrationTests</RootNamespace>
+    <RootNamespace>H.Recognizers.IntegrationTests</RootNamespace>
     <SignAssembly>false</SignAssembly>
   </PropertyGroup>
 
@@ -16,9 +16,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\libs\H.Recognizers.SystemSpeechConverter\H.Recognizers.SystemSpeechConverter.csproj" />
-    <ProjectReference Include="..\..\libs\H.Recognizers.WitAiConverter\H.Recognizers.WitAiConverter.csproj" />
-    <ProjectReference Include="..\..\libs\H.Recognizers.YandexConverter\H.Recognizers.YandexConverter.csproj" />
+    <ProjectReference Include="..\..\libs\H.Recognizers.SystemSpeechRecognizer\H.Recognizers.SystemSpeechRecognizer.csproj" />
+    <ProjectReference Include="..\..\libs\H.Recognizers.WitAiRecognizer\H.Recognizers.WitAiRecognizer.csproj" />
+    <ProjectReference Include="..\..\libs\H.Recognizers.YandexRecognizer\H.Recognizers.YandexRecognizer.csproj" />
   </ItemGroup>
 
 </Project>

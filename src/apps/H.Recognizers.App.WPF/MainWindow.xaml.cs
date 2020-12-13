@@ -7,7 +7,7 @@ using H.Core.Recognizers;
 using H.Core.Utilities;
 using H.Recorders;
 
-namespace H.Converters.App.WPF
+namespace H.Recognizers.App.WPF
 {
     public partial class MainWindow
     {
@@ -15,7 +15,7 @@ namespace H.Converters.App.WPF
         {
             InitializeComponent();
 
-            ConverterComboBox.ItemsSource = new List<string>
+            RecognizerComboBox.ItemsSource = new List<string>
             {
                 nameof(YandexRecognizer), 
                 nameof(WitAiRecognizer)
@@ -33,7 +33,7 @@ namespace H.Converters.App.WPF
                 var cancellationToken = cancellationTokenSource.Token;
                 
                 using var recorder = new NAudioRecorder();
-                using var converter = ConverterComboBox.Text switch
+                using var recognizer = RecognizerComboBox.Text switch
                 {
                     nameof(YandexRecognizer) => new YandexRecognizer
                     {
@@ -52,7 +52,7 @@ namespace H.Converters.App.WPF
                 var exceptions = new ExceptionsBag();
                 exceptions.ExceptionOccurred += (_, exception) => OnException(exception);
 
-                using var recognition = await converter.StartStreamingRecognitionAsync(recorder, false, exceptions, cancellationToken).ConfigureAwait(false);
+                using var recognition = await recognizer.StartStreamingRecognitionAsync(recorder, false, exceptions, cancellationToken).ConfigureAwait(false);
                 recognition.PartialResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
                 {
                     OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Partial: {value}{Environment.NewLine}";
