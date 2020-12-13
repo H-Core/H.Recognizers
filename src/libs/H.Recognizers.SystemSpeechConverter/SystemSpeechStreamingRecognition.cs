@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
-using H.Core.Converters;
+using H.Core.Recognizers;
 using Microsoft.Speech.Recognition;
 
 namespace H.Converters

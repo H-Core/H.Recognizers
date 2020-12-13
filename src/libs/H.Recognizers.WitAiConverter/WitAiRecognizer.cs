@@ -3,7 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using H.Core.Converters;
+using H.Core.Recognizers;
 using Newtonsoft.Json;
 
 namespace H.Converters
@@ -11,11 +11,11 @@ namespace H.Converters
     /// <summary>
     /// 
     /// </summary>
-    public sealed class WitAiConverter : Converter, IConverter
+    public sealed class WitAiRecognizer : Recognizer, IRecognizer
     {
         #region Properties
 
-        bool IConverter.IsStreamingRecognitionSupported => true;
+        bool IRecognizer.IsStreamingRecognitionSupported => true;
 
         /// <summary>
         /// 
@@ -29,7 +29,7 @@ namespace H.Converters
         /// <summary>
         /// 
         /// </summary>
-        public WitAiConverter()
+        public WitAiRecognizer()
         {
             AddSetting(nameof(Token), o => Token = o, NoEmpty, string.Empty);
         }

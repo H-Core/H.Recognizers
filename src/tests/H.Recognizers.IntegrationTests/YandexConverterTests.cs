@@ -1,5 +1,5 @@
 using System.Threading.Tasks;
-using H.Core.Converters;
+using H.Core.Recognizers;
 using H.Core.Recorders;
 using H.Recorders;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,7 +15,7 @@ namespace H.Converters.IntegrationTests
 
         public static IRecorder CreateRecorder() => new NAudioRecorder();
 
-        public static IConverter CreateConverter() => new YandexConverter
+        public static IRecognizer CreateRecognizer() => new YandexRecognizer
         {
             OAuthToken = OAuthToken,
             FolderId = FolderId,
@@ -26,36 +26,36 @@ namespace H.Converters.IntegrationTests
         [TestMethod]
         public async Task StartStreamingRecognitionTest()
         {
-            using var converter = CreateConverter();
+            using var recognizer = CreateRecognizer();
 
-            await BaseConvertersTests.StartStreamingRecognitionTest(converter, "test_test_rus_8000.wav", "проверка");
+            await BaseConvertersTests.StartStreamingRecognitionTest(recognizer, "test_test_rus_8000.wav", "проверка");
         }
 
         [TestMethod]
         public async Task StartStreamingRecognitionTest_RealTime()
         {
             using var recorder = CreateRecorder();
-            using var converter = CreateConverter();
+            using var recognizer = CreateRecognizer();
 
-            var exceptions = await BaseConvertersTests.StartStreamingRecognitionTest_RealTimeAsync(recorder, converter);
+            var exceptions = await BaseConvertersTests.StartStreamingRecognitionTest_RealTimeAsync(recorder, recognizer);
             exceptions.EnsureNoExceptions();
         }
 
         [TestMethod]
         public async Task ConvertTest()
         {
-            using var converter = CreateConverter();
+            using var recognizer = CreateRecognizer();
 
-            await BaseConvertersTests.ConvertTest(converter, "test_test_rus_8000.wav", "проверка проверка");
+            await BaseConvertersTests.ConvertTest(recognizer, "test_test_rus_8000.wav", "проверка проверка");
         }
 
         [TestMethod]
         public async Task ConvertTest_RealTime()
         {
             using var recorder = CreateRecorder();
-            using var converter = CreateConverter();
+            using var recognizer = CreateRecognizer();
 
-            await BaseConvertersTests.ConvertTest_RealTime(recorder, converter);
+            await BaseConvertersTests.ConvertTest_RealTime(recorder, recognizer);
         }
     }
 }

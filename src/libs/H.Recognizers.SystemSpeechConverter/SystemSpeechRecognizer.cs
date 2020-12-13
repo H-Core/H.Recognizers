@@ -3,7 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using H.Core.Converters;
+using H.Core.Recognizers;
 using Microsoft.Speech.Recognition;
 
 namespace H.Converters
@@ -11,11 +11,11 @@ namespace H.Converters
     /// <summary>
     /// 
     /// </summary>
-    public sealed class SystemSpeechConverter : Converter, IConverter
+    public sealed class SystemSpeechRecognizer : Recognizer, IRecognizer
     {
         #region Properties
 
-        bool IConverter.IsStreamingRecognitionSupported => true;
+        bool IRecognizer.IsStreamingRecognitionSupported => true;
 
         private SpeechRecognitionEngine SpeechRecognitionEngine { get; }
         
@@ -31,7 +31,7 @@ namespace H.Converters
         /// <summary>
         /// 
         /// </summary>
-        public SystemSpeechConverter()
+        public SystemSpeechRecognizer()
         {
             AddEnumerableSetting(nameof(Recognizer), o => Recognizer = o, NoEmpty, SpeechRecognitionEngine.InstalledRecognizers().Select(i => i.Name).ToArray());
 

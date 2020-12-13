@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
-using H.Core.Converters;
+using H.Core.Recognizers;
 using H.Core.Utilities;
 using H.Recorders;
 
@@ -17,8 +17,8 @@ namespace H.Converters.App.WPF
 
             ConverterComboBox.ItemsSource = new List<string>
             {
-                nameof(YandexConverter), 
-                nameof(WitAiConverter)
+                nameof(YandexRecognizer), 
+                nameof(WitAiRecognizer)
             };
         }
 
@@ -35,14 +35,14 @@ namespace H.Converters.App.WPF
                 using var recorder = new NAudioRecorder();
                 using var converter = ConverterComboBox.Text switch
                 {
-                    nameof(YandexConverter) => new YandexConverter
+                    nameof(YandexRecognizer) => new YandexRecognizer
                     {
                         OAuthToken = OAuthTokenTextBox.Text,
                         FolderId = FolderIdTextBox.Text,
                         Lang = "ru-RU",
                         SampleRateHertz = 8000,
                     },
-                    nameof(WitAiConverter) or _ => (IConverter)new WitAiConverter
+                    nameof(WitAiRecognizer) or _ => (IRecognizer)new WitAiRecognizer
                     {
                         Token = !string.IsNullOrWhiteSpace(OAuthTokenTextBox.Text)
                             ? OAuthTokenTextBox.Text

@@ -4,7 +4,7 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
-using H.Core.Converters;
+using H.Core.Recognizers;
 using Newtonsoft.Json;
 
 namespace H.Converters

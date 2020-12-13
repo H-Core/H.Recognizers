@@ -5,7 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
-using H.Core.Converters;
+using H.Core.Recognizers;
 using Newtonsoft.Json;
 
 namespace H.Converters

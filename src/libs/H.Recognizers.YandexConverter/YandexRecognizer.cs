@@ -6,8 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
 using H.Converters.Utilities;
-using H.Core;
-using H.Core.Converters;
+using H.Core.Recognizers;
 using Newtonsoft.Json;
 using Yandex.Cloud.Ai.Stt.V2;
 
@@ -16,11 +15,11 @@ namespace H.Converters
     /// <summary>
     /// 
     /// </summary>
-    public sealed class YandexConverter : Converter, IConverter
+    public sealed class YandexRecognizer : Recognizer, IRecognizer
     {
         #region Properties
 
-        bool IConverter.IsStreamingRecognitionSupported => true;
+        bool IRecognizer.IsStreamingRecognitionSupported => true;
 
         /// <summary>
         /// 
@@ -69,7 +68,7 @@ namespace H.Converters
         /// <summary>
         /// 
         /// </summary>
-        public YandexConverter()
+        public YandexRecognizer()
         {
             AddSetting(nameof(FolderId), o => FolderId = o, Any, string.Empty);
             AddSetting(nameof(OAuthToken), o => OAuthToken = o, NoEmpty, string.Empty);

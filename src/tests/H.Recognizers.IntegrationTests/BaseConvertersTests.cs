@@ -2,7 +2,7 @@ using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using H.Core.Converters;
+using H.Core.Recognizers;
 using H.Core.Recorders;
 using H.Core.Utilities;
 using H.IO.Utilities;
@@ -12,9 +12,9 @@ namespace H.Converters.IntegrationTests
 {
     public static class BaseConvertersTests
     {
-        public static async Task StartStreamingRecognitionTest(IConverter converter, string name, string expected, int bytesPerWrite = 8000)
+        public static async Task StartStreamingRecognitionTest(IRecognizer recognizer, string name, string expected, int bytesPerWrite = 8000)
         {
-            using var recognition = await converter.StartStreamingRecognitionAsync();
+            using var recognition = await recognizer.StartStreamingRecognitionAsync();
             recognition.PartialResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterPartialResults: {value}");
             recognition.FinalResultsReceived += (_, value) =>
             {
@@ -37,13 +37,13 @@ namespace H.Converters.IntegrationTests
         }
 
         public static async Task<ExceptionsBag> StartStreamingRecognitionTest_RealTimeAsync(
-            IRecorder recorder, 
-            IConverter converter, 
+            IRecorder recorder,
+            IRecognizer recognizer, 
             bool writeWavHeader = false,
             CancellationToken cancellationToken = default)
         {
             var exceptions = new ExceptionsBag();
-            using var recognition = await converter.StartStreamingRecognitionAsync(recorder, writeWavHeader, exceptions, cancellationToken);
+            using var recognition = await recognizer.StartStreamingRecognitionAsync(recorder, writeWavHeader, exceptions, cancellationToken);
             recognition.PartialResultsReceived += (_, value) =>
             {
                 Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.PartialResultsReceived)}: {value}");
@@ -60,15 +60,15 @@ namespace H.Converters.IntegrationTests
             return exceptions;
         }
 
-        public static async Task ConvertTest(IConverter converter, string name, string expected)
+        public static async Task ConvertTest(IRecognizer recognizer, string name, string expected)
         {
             var bytes = ResourcesUtilities.ReadFileAsBytes(name);
-            var actual = await converter.ConvertAsync(bytes);
+            var actual = await recognizer.ConvertAsync(bytes);
 
             Assert.AreEqual(expected, actual);
         }
 
-        public static async Task ConvertTest_RealTime(IRecorder recorder, IConverter converter)
+        public static async Task ConvertTest_RealTime(IRecorder recorder, IRecognizer recognizer)
         {
             await recorder.StartAsync();
 
@@ -79,7 +79,7 @@ namespace H.Converters.IntegrationTests
             var bytes = recorder.WavData;
             Assert.IsNotNull(bytes, $"{nameof(bytes)} == null");
 
-            var result = await converter.ConvertAsync(bytes);
+            var result = await recognizer.ConvertAsync(bytes);
 
             Console.WriteLine(result);
         }

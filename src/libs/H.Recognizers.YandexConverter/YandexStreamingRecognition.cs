@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Grpc.Core;
-using H.Core.Converters;
+using H.Core.Recognizers;
 using Yandex.Cloud.Ai.Stt.V2;
 
 namespace H.Converters

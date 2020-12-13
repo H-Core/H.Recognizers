@@ -13,7 +13,7 @@ namespace H.Converters.IntegrationTests
         [TestMethod]
         public async Task StartStreamingRecognitionTest_RealTime()
         {
-            using var converter = new SystemSpeechConverter();
+            using var converter = new SystemSpeechRecognizer();
 
             using var recognition = await converter.StartStreamingRecognitionAsync();
             recognition.PartialResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} PartialResultsReceived: {value}");
