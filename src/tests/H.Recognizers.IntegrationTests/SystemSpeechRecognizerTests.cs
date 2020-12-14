@@ -5,7 +5,6 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace H.Recognizers.IntegrationTests
 {
-
     [TestClass]
     [Ignore]
     public class SystemSpeechRecognizerTests

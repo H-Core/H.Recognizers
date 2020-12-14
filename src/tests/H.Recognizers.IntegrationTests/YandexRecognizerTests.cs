@@ -1,3 +1,5 @@
+using System;
+using System.Linq;
 using System.Threading.Tasks;
 using H.Core.Recognizers;
 using H.Core.Recorders;
@@ -7,21 +9,39 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace H.Recognizers.IntegrationTests
 {
     [TestClass]
-    [Ignore]
     public class YandexRecognizerTests
     {
-        public const string FolderId = "$FolderId$";
-        public const string OAuthToken = "$OAuthToken$";
-
-        public static IRecorder CreateRecorder() => new NAudioRecorder();
-
-        public static IRecognizer CreateRecognizer() => new YandexRecognizer
+        public static IRecorder CreateRecorder()
         {
-            OAuthToken = OAuthToken,
-            FolderId = FolderId,
-            Lang = "ru-RU",
-            SampleRateHertz = 8000,
-        };
+            if (!NAudioRecorder.GetAvailableDevices().Any())
+            {
+                Assert.Inconclusive("No available devices for NAudioRecorder.");
+            }
+
+            return new NAudioRecorder();
+        }
+
+        public static IRecognizer CreateRecognizer()
+        {
+            var folderId = Environment.GetEnvironmentVariable("YANDEX_FOLDER_ID");
+            var oAuthToken = Environment.GetEnvironmentVariable("YANDEX_OAUTH_TOKEN");
+            if (folderId == null ||
+                oAuthToken == null ||
+                string.IsNullOrWhiteSpace(folderId) ||
+                string.IsNullOrWhiteSpace(oAuthToken))
+            {
+                Assert.Inconclusive("YANDEX_FOLDER_ID or YANDEX_OAUTH_TOKEN environment variables are not found.");
+                throw new Exception();
+            }
+            
+            return new YandexRecognizer
+            {
+                OAuthToken = oAuthToken,
+                FolderId = folderId,
+                Lang = "ru-RU",
+                SampleRateHertz = 8000,
+            };
+        }
 
         [TestMethod]
         public async Task StartStreamingRecognitionTest()

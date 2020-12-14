@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using H.Core.Recognizers;
 using H.Core.Recorders;
@@ -9,7 +10,16 @@ namespace H.Recognizers.IntegrationTests
     [TestClass]
     public class WitAiRecognizerTests
     {
-        public static IRecorder CreateRecorder() => new NAudioRecorder();
+        public static IRecorder CreateRecorder()
+        {
+            if (!NAudioRecorder.GetAvailableDevices().Any())
+            {
+                Assert.Inconclusive("No available devices for NAudioRecorder.");
+            }
+            
+            return new NAudioRecorder();
+        }
+
         public static IRecognizer CreateRecognizer() => new WitAiRecognizer
         {
             Token = "XZS4M3BUYV5LBMEWJKAGJ6HCPWZ5IDGY"
@@ -24,7 +34,6 @@ namespace H.Recognizers.IntegrationTests
         }
 
         [TestMethod]
-        [Ignore]
         public async Task StartStreamingRecognitionTest_RealTime()
         {
             using var recorder = CreateRecorder();
@@ -43,7 +52,6 @@ namespace H.Recognizers.IntegrationTests
         }
 
         [TestMethod]
-        [Ignore]
         public async Task ConvertTest_RealTime()
         {
             using var recorder = CreateRecorder();
