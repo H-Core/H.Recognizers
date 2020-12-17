@@ -70,13 +70,13 @@ namespace H.Recognizers.IntegrationTests
 
         public static async Task ConvertTest_RealTime(IRecorder recorder, IRecognizer recognizer)
         {
-            await recorder.StartAsync();
+            using var recognition = await recorder.StartAsync();
 
             await Task.Delay(TimeSpan.FromSeconds(5));
 
-            await recorder.StopAsync();
+            await recognition.StopAsync();
 
-            var bytes = recorder.WavData;
+            var bytes = recognition.WavData;
             Assert.IsNotNull(bytes, $"{nameof(bytes)} == null");
 
             var result = await recognizer.ConvertAsync(bytes);

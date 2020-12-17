@@ -23,13 +23,14 @@
                 <ColumnDefinition Width="30*"></ColumnDefinition>
                 <ColumnDefinition Width="70*"></ColumnDefinition>
             </Grid.ColumnDefinitions>
-            <Label Grid.Row="0" Grid.Column="0" Content="Recognizer:"/>
+            <Label Grid.Row="0" Grid.Column="0" Content="Recognizer:" />
             <ComboBox Grid.Row="0" Grid.Column="1" Name="RecognizerComboBox" />
-            <Label Grid.Row="1" Grid.Column="0" Content="OAuthToken:"/>
-            <TextBox Grid.Row="1" Grid.Column="1" Name="OAuthTokenTextBox"/>
-            <Label Grid.Row="2" Grid.Column="0" Content="FolderId:"/>
-            <TextBox Grid.Row="2" Grid.Column="1" Name="FolderIdTextBox"/>
-            <Button Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" Name="ProcessButton" Click="Button_Click" Content="Process"/>
+            <Label Grid.Row="1" Grid.Column="0" Content="OAuthToken:" />
+            <TextBox Grid.Row="1" Grid.Column="1" Name="OAuthTokenTextBox" />
+            <Label Grid.Row="2" Grid.Column="0" Content="FolderId:" />
+            <TextBox Grid.Row="2" Grid.Column="1" Name="FolderIdTextBox" />
+            <Button Grid.Row="4" Grid.Column="0" Name="StartButton" Click="StartButton_Click" Content="Start" />
+            <Button Grid.Row="4" Grid.Column="1" Name="StopButton" Click="StopButton_Click" Content="Stop" IsEnabled="False" />
         </Grid>
     </Grid>
 </Window>

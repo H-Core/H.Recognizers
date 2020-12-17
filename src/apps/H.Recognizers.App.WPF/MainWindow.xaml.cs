@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
 using System.Windows;
 using H.Core.Recognizers;
 using H.Core.Utilities;
@@ -11,6 +9,14 @@ namespace H.Recognizers.App.WPF
 {
     public partial class MainWindow
     {
+        #region Properties
+
+        protected IStreamingRecognition? Recognition { get; set; }
+
+        #endregion
+
+        #region MyRegion
+
         public MainWindow()
         {
             InitializeComponent();
@@ -22,16 +28,21 @@ namespace H.Recognizers.App.WPF
             };
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        #endregion
+
+        #region Event Handlers
+
+        private async void StartButton_Click(object sender, RoutedEventArgs e)
         {
-            ProcessButton.IsEnabled = false;
-            OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Started {Environment.NewLine}";
+            Dispatcher?.Invoke(() =>
+            {
+                StartButton.IsEnabled = false;
+                StopButton.IsEnabled = true;
+                OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Started {Environment.NewLine}";
+            });
 
             try
             {
-                using var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(30));
-                var cancellationToken = cancellationTokenSource.Token;
-                
                 using var recorder = new NAudioRecorder();
                 using var recognizer = RecognizerComboBox.Text switch
                 {
@@ -52,35 +63,52 @@ namespace H.Recognizers.App.WPF
                 var exceptions = new ExceptionsBag();
                 exceptions.ExceptionOccurred += (_, exception) => OnException(exception);
 
-                using var recognition = await recognizer.StartStreamingRecognitionAsync(recorder, false, exceptions, cancellationToken).ConfigureAwait(false);
-                recognition.PartialResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
+                Recognition = await recognizer.StartStreamingRecognitionAsync(recorder, false, exceptions).ConfigureAwait(false);
+                Recognition.PartialResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
                 {
                     OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Partial: {value}{Environment.NewLine}";
                 });
-                recognition.FinalResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
+                Recognition.FinalResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
                 {
                     OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Final: {value}{Environment.NewLine}";
                 });
-
-                await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken).ConfigureAwait(false);
-
-                await recognition.StopAsync(cancellationToken).ConfigureAwait(false);
             }
             catch (Exception exception)
             {
                 OnException(exception);
             }
-
+        }
+        
+        private async void StopButton_Click(object sender, RoutedEventArgs e)
+        {
             Dispatcher?.Invoke(() =>
             {
-                ProcessButton.IsEnabled = true;
+                StartButton.IsEnabled = true;
+                StopButton.IsEnabled = false;
                 OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Ended {Environment.NewLine}";
             });
+            
+            try
+            {
+                if (Recognition != null)
+                {
+                    await Recognition.StopAsync().ConfigureAwait(false);
+                    
+                    Recognition.Dispose();
+                    Recognition = null;
+                }
+            }
+            catch (Exception exception)
+            {
+                OnException(exception);
+            }
         }
 
         private static void OnException(Exception exception)
         {
             MessageBox.Show(exception.ToString());
         }
+
+        #endregion
     }
 }
