@@ -39,7 +39,7 @@ namespace H.Recognizers.IntegrationTests
             using var recorder = CreateRecorder();
             using var recognizer = CreateRecognizer();
 
-            var exceptions = await BaseTests.StartStreamingRecognitionTest_RealTimeAsync(recorder, recognizer, true);
+            var exceptions = await BaseTests.StartStreamingRecognitionTest_RealTimeAsync(recorder, recognizer);
             exceptions.EnsureNoExceptions();
         }
 

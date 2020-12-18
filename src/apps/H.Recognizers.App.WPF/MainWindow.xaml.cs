@@ -63,7 +63,7 @@ namespace H.Recognizers.App.WPF
                 var exceptions = new ExceptionsBag();
                 exceptions.ExceptionOccurred += (_, exception) => OnException(exception);
 
-                Recognition = await recognizer.StartStreamingRecognitionAsync(recorder, false, exceptions).ConfigureAwait(false);
+                Recognition = await recognizer.StartStreamingRecognitionAsync(recorder, exceptions).ConfigureAwait(false);
                 Recognition.PartialResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
                 {
                     OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Partial: {value}{Environment.NewLine}";

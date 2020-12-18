@@ -20,7 +20,7 @@ namespace H.Recognizers
 
         private AsyncDuplexStreamingCall<StreamingRecognitionRequest, StreamingRecognitionResponse> Call { get; }
 
-        private ConcurrentQueue<byte[]> WriteQueue { get; } = new ConcurrentQueue<byte[]>();
+        private ConcurrentQueue<byte[]> WriteQueue { get; } = new ();
         private Task ReceiveTask { get; }
         private Task WriteTask { get; }
         private bool IsFinished { get; set; }
@@ -120,22 +120,11 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
+        public override void Dispose()
         {
-            if (IsDisposed)
-            {
-                return;
-            }
+            Call.Dispose();
 
-            if (disposing)
-            {
-                ReceiveTask.Dispose();
-                WriteTask.Dispose();
-                Call.Dispose();
-            }
-
-            base.Dispose(disposing);
+            base.Dispose();
         }
 
         #endregion

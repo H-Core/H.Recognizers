@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using Grpc.Core;
+using H.Core;
 using H.Core.Recognizers;
 using H.Recognizers.Utilities;
 using Newtonsoft.Json;
@@ -15,11 +16,9 @@ namespace H.Recognizers
     /// <summary>
     /// 
     /// </summary>
-    public sealed class YandexRecognizer : Recognizer, IRecognizer
+    public sealed class YandexRecognizer : Recognizer
     {
         #region Properties
-
-        bool IRecognizer.IsStreamingRecognitionSupported => true;
 
         /// <summary>
         /// 
@@ -39,7 +38,7 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public string Format { get; set; } = string.Empty;
+        public string AudioEncoding { get; set; } = string.Empty;
         
         /// <summary>
         /// 
@@ -68,7 +67,7 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public YandexRecognizer()
+        public YandexRecognizer() : base(RecordingFormat.Wav, RecordingFormat.Raw)
         {
             AddSetting(nameof(FolderId), o => FolderId = o, Any, string.Empty);
             AddSetting(nameof(OAuthToken), o => OAuthToken = o, NoEmpty, string.Empty);
@@ -76,7 +75,7 @@ namespace H.Recognizers
             AddEnumerableSetting(nameof(Lang), o => Lang = o, NoEmpty, new[] { "ru-RU", "en-US", "uk-UK", "tr-TR" });
             AddEnumerableSetting(nameof(Topic), o => Topic = o, NoEmpty, new[] { "general", "maps", "dates", "names", "numbers" });
             AddEnumerableSetting(nameof(ProfanityFilter), o => ProfanityFilter = o == "true", NoEmpty, new[] { "false", "true" });
-            AddEnumerableSetting(nameof(Format), o => Format = o, NoEmpty, new[] { "lpcm", "oggopus" });
+            AddEnumerableSetting(nameof(AudioEncoding), o => AudioEncoding = o, NoEmpty, new[] { "lpcm", "oggopus" });
             AddEnumerableSetting(nameof(SampleRateHertz), o => SampleRateHertz = int.TryParse(o, out var value) ? value : default, NoEmpty, new[] { "8000", "48000", "16000" });
         }
 
@@ -109,7 +108,7 @@ namespace H.Recognizers
                         LanguageCode = Lang,
                         ProfanityFilter = ProfanityFilter,
                         Model = Topic,
-                        AudioEncoding = Format switch
+                        AudioEncoding = AudioEncoding switch
                         {
                             "oggopus" => RecognitionSpec.Types.AudioEncoding.OggOpus,
                             "lpcm" => RecognitionSpec.Types.AudioEncoding.Linear16Pcm,
@@ -141,7 +140,7 @@ namespace H.Recognizers
                 { "lang", Lang },
                 { "topic", Topic },
                 { "profanityFilter", ProfanityFilter ? "true" :  "false" },
-                { "format", Format },
+                { "format", AudioEncoding },
                 { "sampleRateHertz", $"{SampleRateHertz}" },
                 { "folderId", FolderId },
             }))

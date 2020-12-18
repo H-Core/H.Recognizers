@@ -39,11 +39,10 @@ namespace H.Recognizers.IntegrationTests
         public static async Task<ExceptionsBag> StartStreamingRecognitionTest_RealTimeAsync(
             IRecorder recorder,
             IRecognizer recognizer, 
-            bool writeWavHeader = false,
             CancellationToken cancellationToken = default)
         {
             var exceptions = new ExceptionsBag();
-            using var recognition = await recognizer.StartStreamingRecognitionAsync(recorder, writeWavHeader, exceptions, cancellationToken);
+            using var recognition = await recognizer.StartStreamingRecognitionAsync(recorder, exceptions, cancellationToken);
             recognition.PartialResultsReceived += (_, value) =>
             {
                 Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.PartialResultsReceived)}: {value}");
@@ -70,13 +69,13 @@ namespace H.Recognizers.IntegrationTests
 
         public static async Task ConvertTest_RealTime(IRecorder recorder, IRecognizer recognizer)
         {
-            using var recognition = await recorder.StartAsync();
+            using var recognition = await recorder.StartAsync(recognizer.Format);
 
             await Task.Delay(TimeSpan.FromSeconds(5));
 
             await recognition.StopAsync();
 
-            var bytes = recognition.WavData;
+            var bytes = recognition.Data;
             Assert.IsNotNull(bytes, $"{nameof(bytes)} == null");
 
             var result = await recognizer.ConvertAsync(bytes);

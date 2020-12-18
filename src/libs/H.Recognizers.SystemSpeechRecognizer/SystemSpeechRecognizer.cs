@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using H.Core;
 using H.Core.Recognizers;
 using Microsoft.Speech.Recognition;
 
@@ -11,11 +12,9 @@ namespace H.Recognizers
     /// <summary>
     /// 
     /// </summary>
-    public sealed class SystemSpeechRecognizer : Recognizer, IRecognizer
+    public sealed class SystemSpeechRecognizer : Recognizer
     {
         #region Properties
-
-        bool IRecognizer.IsStreamingRecognitionSupported => true;
 
         private SpeechRecognitionEngine SpeechRecognitionEngine { get; }
         
@@ -31,7 +30,7 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public SystemSpeechRecognizer()
+        public SystemSpeechRecognizer() : base(RecordingFormat.Raw, RecordingFormat.Raw)
         {
             AddEnumerableSetting(nameof(Recognizer), o => Recognizer = o, NoEmpty, SpeechRecognitionEngine.InstalledRecognizers().Select(i => i.Name).ToArray());
 
@@ -75,12 +74,10 @@ namespace H.Recognizers
             throw new NotImplementedException();
         }
 
-#pragma warning disable CA1063 // Implement IDisposable Correctly
         /// <summary>
         /// 
         /// </summary>
         public override void Dispose()
-#pragma warning restore CA1063 // Implement IDisposable Correctly
         {
             SpeechRecognitionEngine.Dispose();
 

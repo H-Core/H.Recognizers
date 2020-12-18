@@ -127,21 +127,11 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
+        public override void Dispose()
         {
-            if (IsDisposed)
-            {
-                return;
-            }
-
-            if (disposing)
-            {
-                Stream.Dispose();
-                WriteTask.Dispose();
-            }
-
-            base.Dispose(disposing);
+            Stream.Dispose();
+            
+            base.Dispose();
         }
 
         #endregion

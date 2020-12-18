@@ -3,6 +3,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using H.Core;
 using H.Core.Recognizers;
 using Newtonsoft.Json;
 
@@ -11,11 +12,9 @@ namespace H.Recognizers
     /// <summary>
     /// 
     /// </summary>
-    public sealed class WitAiRecognizer : Recognizer, IRecognizer
+    public sealed class WitAiRecognizer : Recognizer
     {
         #region Properties
-
-        bool IRecognizer.IsStreamingRecognitionSupported => true;
 
         /// <summary>
         /// 
@@ -29,7 +28,7 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public WitAiRecognizer()
+        public WitAiRecognizer() : base(RecordingFormat.Wav, RecordingFormat.Wav)
         {
             AddSetting(nameof(Token), o => Token = o, NoEmpty, string.Empty);
         }

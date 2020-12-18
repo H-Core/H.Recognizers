@@ -7,8 +7,8 @@
   </PropertyGroup>
 
   <PropertyGroup Label="Nuget">
-    <Version>0.15.1</Version>
-    <PackageReleaseNotes>To H.Core 0.15.1.</PackageReleaseNotes>
+    <Version>0.16.5</Version>
+    <PackageReleaseNotes>To H.Core 0.16.5.</PackageReleaseNotes>
     <GeneratePackageOnBuild Condition=" '$(Configuration)' == 'Release' ">true</GeneratePackageOnBuild>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
     <Authors>havendv</Authors>

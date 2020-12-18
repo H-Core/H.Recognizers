@@ -10,7 +10,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="H.Core" Version="0.15.1" />
+    <PackageReference Include="H.Core" Version="0.16.5" />
   </ItemGroup>
 
   <ItemGroup>

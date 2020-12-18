@@ -122,21 +122,12 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        /// <param name="disposing"></param>
-        protected override void Dispose(bool disposing)
+        public override void Dispose()
         {
-            if (IsDisposed)
-            {
-                return;
-            }
+            HttpClient.Dispose();
+            HttpRequestMessage.Dispose();
 
-            if (disposing)
-            {
-                HttpClient.Dispose();
-                HttpRequestMessage.Dispose();
-            }
-
-            base.Dispose(disposing);
+            base.Dispose();
         }
 
         #endregion
