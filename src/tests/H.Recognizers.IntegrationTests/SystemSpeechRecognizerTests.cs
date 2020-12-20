@@ -15,8 +15,14 @@ namespace H.Recognizers.IntegrationTests
             using var recognizer = new SystemSpeechRecognizer();
 
             using var recognition = await recognizer.StartStreamingRecognitionAsync();
-            recognition.PartialResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} PartialResultsReceived: {value}");
-            recognition.FinalResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} FinalResultsReceived: {value}");
+            recognition.PreviewReceived += (_, value) =>
+            {
+                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.PreviewReceived)}: {value}");
+            };
+            recognition.Stopped += (_, value) =>
+            {
+                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.Stopped)}: {value}");
+            };
 
             await Task.Delay(TimeSpan.FromSeconds(5));
 

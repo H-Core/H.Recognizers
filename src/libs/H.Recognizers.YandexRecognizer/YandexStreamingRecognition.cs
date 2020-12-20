@@ -21,7 +21,7 @@ namespace H.Recognizers
         private AsyncDuplexStreamingCall<StreamingRecognitionRequest, StreamingRecognitionResponse> Call { get; }
 
         private ConcurrentQueue<byte[]> WriteQueue { get; } = new ();
-        private Task ReceiveTask { get; }
+        private Task<string> ReceiveTask { get; }
         private Task WriteTask { get; }
         private bool IsFinished { get; set; }
 
@@ -52,16 +52,17 @@ namespace H.Recognizers
                         if (chunk.Final)
                         {
                             IsFinished = true;
-                            OnFinalResultsReceived(text);
+                            
+                            return text;
                         }
-                        else
-                        {
-                            OnPartialResultsReceived(text);
-                        }
+
+                        OnPreviewReceived(text);
                     }
 
                     Trace.WriteLine($"{DateTime.Now:h:mm:ss.fff} YandexStreamingRecognition: {response}");
                 }
+
+                return string.Empty;
             });
             WriteTask = Task.Run(async () =>
             {
@@ -104,7 +105,7 @@ namespace H.Recognizers
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override async Task StopAsync(CancellationToken cancellationToken = default)
+        public override async Task<string> StopAsync(CancellationToken cancellationToken = default)
         {
             OnStopping();
 
@@ -112,9 +113,11 @@ namespace H.Recognizers
 
             await Call.RequestStream.CompleteAsync().ConfigureAwait(false);
 
-            await ReceiveTask.ConfigureAwait(false);
+            Result = await ReceiveTask.ConfigureAwait(false);
             
-            OnStopped();
+            OnStopped(Result);
+
+            return Result;
         }
 
         /// <summary>

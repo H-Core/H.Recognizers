@@ -91,8 +91,14 @@ namespace H.Recognizers
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override async Task StopAsync(CancellationToken cancellationToken = default)
+        public override async Task<string> StopAsync(CancellationToken cancellationToken = default)
         {
+            if (IsStopped)
+            {
+                return Result;
+            }
+            
+            OnStopping();
             IsStopped = true;
 
             await WriteTask.ConfigureAwait(false);
@@ -121,7 +127,10 @@ namespace H.Recognizers
 
             var obj = JsonConvert.DeserializeObject<WitAiResponse>(json);
 
-            OnFinalResultsReceived(obj.Text ?? string.Empty);
+            Result = obj.Text ?? string.Empty;
+            OnStopped(Result);
+            
+            return Result;
         }
 
         /// <summary>

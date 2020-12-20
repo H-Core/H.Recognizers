@@ -15,10 +15,13 @@ namespace H.Recognizers.IntegrationTests
         public static async Task StartStreamingRecognitionTest(IRecognizer recognizer, string name, string expected, int bytesPerWrite = 8000)
         {
             using var recognition = await recognizer.StartStreamingRecognitionAsync();
-            recognition.PartialResultsReceived += (_, value) => Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterPartialResults: {value}");
-            recognition.FinalResultsReceived += (_, value) =>
+            recognition.PreviewReceived += (_, value) =>
             {
-                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} AfterFinalResults: {value}");
+                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.PreviewReceived)}: {value}");
+            };
+            recognition.Stopped += (_, value) =>
+            {
+                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.Stopped)}: {value}");
 
                 Assert.AreEqual(expected, value);
             };
@@ -43,13 +46,13 @@ namespace H.Recognizers.IntegrationTests
         {
             var exceptions = new ExceptionsBag();
             using var recognition = await recognizer.StartStreamingRecognitionAsync(recorder, exceptions, cancellationToken);
-            recognition.PartialResultsReceived += (_, value) =>
+            recognition.PreviewReceived += (_, value) =>
             {
-                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.PartialResultsReceived)}: {value}");
+                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.PreviewReceived)}: {value}");
             };
-            recognition.FinalResultsReceived += (_, value) =>
+            recognition.Stopped += (_, value) =>
             {
-                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.FinalResultsReceived)}: {value}");
+                Console.WriteLine($"{DateTime.Now:h:mm:ss.fff} {nameof(recognition.Stopped)}: {value}");
             };
 
             await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken);

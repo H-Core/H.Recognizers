@@ -23,8 +23,13 @@ namespace H.Recognizers
         {
             SpeechRecognitionEngine = speechRecognitionEngine ?? throw new ArgumentNullException(nameof(speechRecognitionEngine));
 
-            SpeechRecognitionEngine.SpeechHypothesized += (_, args) => OnPartialResultsReceived(args.Result.Text);
-            SpeechRecognitionEngine.SpeechRecognized += (_, args) => OnFinalResultsReceived(args.Result.Text);
+            SpeechRecognitionEngine.SpeechHypothesized += (_, args) => OnPreviewReceived(args.Result.Text);
+            SpeechRecognitionEngine.SpeechRecognized += (_, args) =>
+            {
+                Result = args.Result.Text;
+                
+                OnStopped(Result);
+            };
 
             SpeechRecognitionEngine.RecognizeAsync(RecognizeMode.Multiple);
         }
@@ -49,15 +54,13 @@ namespace H.Recognizers
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override Task StopAsync(CancellationToken cancellationToken = default)
+        public override Task<string> StopAsync(CancellationToken cancellationToken = default)
         {
             OnStopping();
             
             SpeechRecognitionEngine.RecognizeAsyncStop();
-
-            OnStopped();
             
-            return Task.CompletedTask;
+            return Task.FromResult(Result);
         }
 
         #endregion

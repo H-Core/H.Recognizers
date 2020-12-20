@@ -92,8 +92,13 @@ namespace H.Recognizers
         /// </summary>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override async Task StopAsync(CancellationToken cancellationToken = default)
+        public override async Task<string> StopAsync(CancellationToken cancellationToken = default)
         {
+            if (IsStopped)
+            {
+                return Result;
+            }
+            
             OnStopping();
 
             IsStopped = true;
@@ -111,12 +116,12 @@ namespace H.Recognizers
                 throw new InvalidOperationException($"Invalid response: {json}");
             }
 
-
             var obj = JsonConvert.DeserializeObject<WitAiResponse>(json);
 
-            OnFinalResultsReceived(obj.Text ?? string.Empty);
-            
-            OnStopped();
+            Result = obj.Text ?? string.Empty;
+            OnStopped(Result);
+
+            return Result;
         }
 
         /// <summary>
