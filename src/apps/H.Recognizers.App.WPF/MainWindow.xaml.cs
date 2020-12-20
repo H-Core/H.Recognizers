@@ -64,11 +64,11 @@ namespace H.Recognizers.App.WPF
                 exceptions.ExceptionOccurred += (_, exception) => OnException(exception);
 
                 Recognition = await recognizer.StartStreamingRecognitionAsync(recorder, exceptions).ConfigureAwait(false);
-                Recognition.PartialResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
+                Recognition.PreviewReceived += (_, value) => Dispatcher?.Invoke(() =>
                 {
-                    OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Partial: {value}{Environment.NewLine}";
+                    OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Preview: {value}{Environment.NewLine}";
                 });
-                Recognition.FinalResultsReceived += (_, value) => Dispatcher?.Invoke(() =>
+                Recognition.Stopped += (_, value) => Dispatcher?.Invoke(() =>
                 {
                     OutputTextBox.Text += $"{DateTime.Now:h:mm:ss.fff} Final: {value}{Environment.NewLine}";
                 });
