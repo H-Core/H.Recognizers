@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet">
-    <Description></Description>
+    <Description>Translates speech to text based on services from wit.ai.</Description>
+    <PackageTags>wit.ai, recognizer, speech-to-text</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>

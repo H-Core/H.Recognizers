@@ -6,8 +6,9 @@
 
   <PropertyGroup Label="NuGet">
     <Version>1.0.0</Version>
-    <Description></Description>
     <PackageReleaseNotes></PackageReleaseNotes>
+    <Description>Yandex Cloud SDK.</Description>
+    <PackageTags>yandex-cloud</PackageTags>
   </PropertyGroup>
 
   <PropertyGroup Label="Protobuf Generation">

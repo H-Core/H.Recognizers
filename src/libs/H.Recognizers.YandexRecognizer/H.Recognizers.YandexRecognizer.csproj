@@ -6,7 +6,8 @@
   </PropertyGroup>
 
   <PropertyGroup Label="NuGet">
-    <Description></Description>
+    <Description>Translates speech to text based on services from Yandex Cloud.</Description>
+    <PackageTags>yandex-cloud, recognizer, speech-to-text</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
