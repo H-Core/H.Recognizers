@@ -67,7 +67,7 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public YandexRecognizer() : base(RecordingFormat.Wav, RecordingFormat.Raw)
+        public YandexRecognizer() : base(AudioFormat.Wav, AudioFormat.Raw)
         {
             AddSetting(nameof(FolderId), o => FolderId = o, Any, string.Empty);
             AddSetting(nameof(OAuthToken), o => OAuthToken = o, NoEmpty, string.Empty);

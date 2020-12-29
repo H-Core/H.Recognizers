@@ -28,7 +28,7 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public WitAiRecognizer() : base(RecordingFormat.Wav, RecordingFormat.Wav)
+        public WitAiRecognizer() : base(AudioFormat.Wav, AudioFormat.Wav)
         {
             AddSetting(nameof(Token), o => Token = o, NoEmpty, string.Empty);
         }

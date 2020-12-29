@@ -30,7 +30,7 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public SystemSpeechRecognizer() : base(RecordingFormat.Raw, RecordingFormat.Raw)
+        public SystemSpeechRecognizer() : base(AudioFormat.Raw, AudioFormat.Raw)
         {
             AddEnumerableSetting(nameof(Recognizer), o => Recognizer = o, NoEmpty, SpeechRecognitionEngine.InstalledRecognizers().Select(i => i.Name).ToArray());
 
