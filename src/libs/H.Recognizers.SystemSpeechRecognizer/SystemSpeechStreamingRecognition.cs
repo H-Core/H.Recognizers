@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Threading;
 using System.Threading.Tasks;
+using H.Core;
 using H.Core.Recognizers;
 using Microsoft.Speech.Recognition;
 
@@ -19,7 +20,7 @@ namespace H.Recognizers
 
         #region Constructors
 
-        internal SystemSpeechStreamingRecognition(SpeechRecognitionEngine speechRecognitionEngine)
+        internal SystemSpeechStreamingRecognition(AudioSettings settings, SpeechRecognitionEngine speechRecognitionEngine) : base(settings)
         {
             SpeechRecognitionEngine = speechRecognitionEngine ?? throw new ArgumentNullException(nameof(speechRecognitionEngine));
 

@@ -39,7 +39,6 @@ namespace H.Recognizers.IntegrationTests
                 OAuthToken = oAuthToken,
                 FolderId = folderId,
                 Lang = "ru-RU",
-                SampleRateHertz = 8000,
             };
         }
 

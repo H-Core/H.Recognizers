@@ -7,11 +7,11 @@
 
   <PropertyGroup Label="NuGet">
     <Description>Translates speech to text based on services from Yandex Cloud.</Description>
-    <PackageTags>yandex-cloud, recognizer, speech-to-text</PackageTags>
+    <PackageTags>yandex-cloud, recognizer, speech-to-text, h.core, h.framework</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="H.Core" Version="0.19.1" />
+    <PackageReference Include="H.Core" Version="0.20.2" />
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
   </ItemGroup>
 

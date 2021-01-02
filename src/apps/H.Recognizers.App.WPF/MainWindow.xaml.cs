@@ -51,7 +51,6 @@ namespace H.Recognizers.App.WPF
                         OAuthToken = OAuthTokenTextBox.Text,
                         FolderId = FolderIdTextBox.Text,
                         Lang = "ru-RU",
-                        SampleRateHertz = 8000,
                     },
                     nameof(WitAiRecognizer) or _ => (IRecognizer)new WitAiRecognizer
                     {

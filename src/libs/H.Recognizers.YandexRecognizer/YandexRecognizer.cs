@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
@@ -38,16 +39,6 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public string AudioEncoding { get; set; } = string.Empty;
-        
-        /// <summary>
-        /// 
-        /// </summary>
-        public int SampleRateHertz { get; set; }
-        
-        /// <summary>
-        /// 
-        /// </summary>
         public string FolderId { get; set; } = string.Empty;
         
         /// <summary>
@@ -67,7 +58,7 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public YandexRecognizer() : base(AudioFormat.Wav, AudioFormat.Raw)
+        public YandexRecognizer()
         {
             AddSetting(nameof(FolderId), o => FolderId = o, Any, string.Empty);
             AddSetting(nameof(OAuthToken), o => OAuthToken = o, NoEmpty, string.Empty);
@@ -75,8 +66,16 @@ namespace H.Recognizers
             AddEnumerableSetting(nameof(Lang), o => Lang = o, NoEmpty, new[] { "ru-RU", "en-US", "uk-UK", "tr-TR" });
             AddEnumerableSetting(nameof(Topic), o => Topic = o, NoEmpty, new[] { "general", "maps", "dates", "names", "numbers" });
             AddEnumerableSetting(nameof(ProfanityFilter), o => ProfanityFilter = o == "true", NoEmpty, new[] { "false", "true" });
-            AddEnumerableSetting(nameof(AudioEncoding), o => AudioEncoding = o, NoEmpty, new[] { "lpcm", "oggopus" });
-            AddEnumerableSetting(nameof(SampleRateHertz), o => SampleRateHertz = int.TryParse(o, out var value) ? value : default, NoEmpty, new[] { "8000", "48000", "16000" });
+
+            SupportedSettings.Add(new AudioSettings());
+            SupportedSettings.Add(new AudioSettings(rate: 48000));
+            SupportedSettings.Add(new AudioSettings(rate: 16000));
+            SupportedSettings.Add(new AudioSettings(AudioFormat.Ogg));
+
+            SupportedStreamingSettings.Add(new AudioSettings());
+            SupportedStreamingSettings.Add(new AudioSettings(rate: 48000));
+            SupportedStreamingSettings.Add(new AudioSettings(rate: 16000));
+            SupportedStreamingSettings.Add(new AudioSettings(AudioFormat.Ogg));
         }
 
         #endregion
@@ -86,10 +85,15 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="settings"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override async Task<IStreamingRecognition> StartStreamingRecognitionAsync(CancellationToken cancellationToken = default)
+        public override async Task<IStreamingRecognition> StartStreamingRecognitionAsync(
+            AudioSettings? settings = null,
+            CancellationToken cancellationToken = default)
         {
+            settings ??= SupportedStreamingSettings.First();
+
             IamToken ??= await RequestIamTokenByOAuthTokenAsync(OAuthToken, cancellationToken).ConfigureAwait(false);
 
             var channel = new Channel("stt.api.cloud.yandex.net", 443, new SslCredentials());
@@ -108,30 +112,36 @@ namespace H.Recognizers
                         LanguageCode = Lang,
                         ProfanityFilter = ProfanityFilter,
                         Model = Topic,
-                        AudioEncoding = AudioEncoding switch
+                        AudioEncoding = settings.Format switch
                         {
-                            "oggopus" => RecognitionSpec.Types.AudioEncoding.OggOpus,
-                            "lpcm" => RecognitionSpec.Types.AudioEncoding.Linear16Pcm,
+                            AudioFormat.Ogg => RecognitionSpec.Types.AudioEncoding.OggOpus,
+                            AudioFormat.Raw => RecognitionSpec.Types.AudioEncoding.Linear16Pcm,
                             _ => RecognitionSpec.Types.AudioEncoding.Unspecified,
                         },
-                        SampleRateHertz = SampleRateHertz,
+                        SampleRateHertz = settings.Rate,
                         PartialResults = true,
                     },
                     FolderId = FolderId,
                 }
             }).ConfigureAwait(false);
 
-            return new YandexStreamingRecognition(call);
+            return new YandexStreamingRecognition(settings, call);
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="bytes"></param>
+        /// <param name="settings"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override async Task<string> ConvertAsync(byte[] bytes, CancellationToken cancellationToken = default)
+        public override async Task<string> ConvertAsync(
+            byte[] bytes, 
+            AudioSettings? settings = null,
+            CancellationToken cancellationToken = default)
         {
+            settings ??= SupportedSettings.First();
+
             IamToken ??= await RequestIamTokenByOAuthTokenAsync(OAuthToken, cancellationToken).ConfigureAwait(false);
 
             using var client = new HttpClient();
@@ -140,8 +150,13 @@ namespace H.Recognizers
                 { "lang", Lang },
                 { "topic", Topic },
                 { "profanityFilter", ProfanityFilter ? "true" :  "false" },
-                { "format", AudioEncoding },
-                { "sampleRateHertz", $"{SampleRateHertz}" },
+                { "format", settings.Format switch
+                    {
+                        AudioFormat.Ogg => "oggopus",
+                        _ or AudioFormat.Raw => "lpcm",
+                    }
+                },
+                { "sampleRateHertz", $"{settings.Rate}" },
                 { "folderId", FolderId },
             }))
             {

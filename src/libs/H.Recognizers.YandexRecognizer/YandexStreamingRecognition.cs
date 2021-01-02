@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Google.Protobuf;
 using Grpc.Core;
+using H.Core;
 using H.Core.Recognizers;
 using Yandex.Cloud.Ai.Stt.V2;
 
@@ -29,7 +30,10 @@ namespace H.Recognizers
 
         #region Constructors
 
-        internal YandexStreamingRecognition(AsyncDuplexStreamingCall<StreamingRecognitionRequest, StreamingRecognitionResponse> call)
+        internal YandexStreamingRecognition(
+            AudioSettings settings, 
+            AsyncDuplexStreamingCall<StreamingRecognitionRequest, StreamingRecognitionResponse> call) :
+            base(settings)
         {
             Call = call ?? throw new ArgumentNullException(nameof(call));
 

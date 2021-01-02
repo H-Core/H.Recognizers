@@ -30,7 +30,7 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public SystemSpeechRecognizer() : base(AudioFormat.Raw, AudioFormat.Raw)
+        public SystemSpeechRecognizer()
         {
             AddEnumerableSetting(nameof(Recognizer), o => Recognizer = o, NoEmpty, SpeechRecognitionEngine.InstalledRecognizers().Select(i => i.Name).ToArray());
 
@@ -56,20 +56,30 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="settings"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override Task<IStreamingRecognition> StartStreamingRecognitionAsync(CancellationToken cancellationToken = default)
+        public override Task<IStreamingRecognition> StartStreamingRecognitionAsync(
+            AudioSettings? settings = null, 
+            CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<IStreamingRecognition>(new SystemSpeechStreamingRecognition(SpeechRecognitionEngine));
+            settings ??= new AudioSettings();
+
+            return Task.FromResult<IStreamingRecognition>(
+                new SystemSpeechStreamingRecognition(settings, SpeechRecognitionEngine));
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="bytes"></param>
+        /// <param name="settings"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override Task<string> ConvertAsync(byte[] bytes, CancellationToken cancellationToken = default)
+        public override Task<string> ConvertAsync(
+            byte[] bytes,
+            AudioSettings? settings = null, 
+            CancellationToken cancellationToken = default)
         {
             throw new NotImplementedException();
         }

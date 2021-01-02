@@ -72,7 +72,7 @@ namespace H.Recognizers.IntegrationTests
 
         public static async Task ConvertTest_RealTime(IRecorder recorder, IRecognizer recognizer)
         {
-            using var recognition = await recorder.StartAsync(recognizer.Format);
+            using var recognition = await recorder.StartAsync(recognizer.SupportedSettings.First());
 
             await Task.Delay(TimeSpan.FromSeconds(5));
 

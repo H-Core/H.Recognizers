@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
+using H.Core;
 using H.Core.Recognizers;
 using Newtonsoft.Json;
 
@@ -31,7 +32,7 @@ namespace H.Recognizers
 
         #region Constructors
 
-        internal WitAiStreamingRecognition(string token)
+        internal WitAiStreamingRecognition(AudioSettings settings, string token) : base(settings)
         {
             Token = token ?? throw new ArgumentNullException(nameof(token));
 

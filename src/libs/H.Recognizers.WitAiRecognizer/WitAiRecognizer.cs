@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Threading;
@@ -28,9 +29,12 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
-        public WitAiRecognizer() : base(AudioFormat.Wav, AudioFormat.Wav)
+        public WitAiRecognizer()
         {
             AddSetting(nameof(Token), o => Token = o, NoEmpty, string.Empty);
+
+            SupportedSettings.Add(new AudioSettings(AudioFormat.Wav));
+            SupportedStreamingSettings.Add(new AudioSettings(AudioFormat.Wav));
         }
 
         #endregion
@@ -40,21 +44,28 @@ namespace H.Recognizers
         /// <summary>
         /// 
         /// </summary>
+        /// <param name="settings"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override Task<IStreamingRecognition> StartStreamingRecognitionAsync(CancellationToken cancellationToken = default)
+        public override Task<IStreamingRecognition> StartStreamingRecognitionAsync(AudioSettings? settings = null, CancellationToken cancellationToken = default)
         {
-            return Task.FromResult<IStreamingRecognition>(new WitAiStreamingRecognition(Token));
+            settings ??= SupportedStreamingSettings.First();
+
+            return Task.FromResult<IStreamingRecognition>(
+                new WitAiStreamingRecognition(settings, Token));
         }
 
         /// <summary>
         /// 
         /// </summary>
         /// <param name="bytes"></param>
+        /// <param name="settings"></param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
-        public override async Task<string> ConvertAsync(byte[] bytes, CancellationToken cancellationToken = default)
+        public override async Task<string> ConvertAsync(byte[] bytes, AudioSettings? settings = null, CancellationToken cancellationToken = default)
         {
+            settings ??= SupportedSettings.First();
+
             using var client = new HttpClient();
             using var request = new HttpRequestMessage(HttpMethod.Post, "https://api.wit.ai/speech")
             {
@@ -67,7 +78,11 @@ namespace H.Recognizers
                 {
                     Headers =
                     {
-                        ContentType = MediaTypeHeaderValue.Parse("audio/wav"),
+                        ContentType = settings.Format switch
+                        {
+                            AudioFormat.Raw => MediaTypeHeaderValue.Parse("audio/raw;encoding=signed-integer;bits=16;rate=8000;endian=little"),
+                            _ or AudioFormat.Wav => MediaTypeHeaderValue.Parse("audio/wav"),
+                        },
                     },
                 },
             };

@@ -12,7 +12,7 @@
 
   <ItemGroup>
     <PackageReference Include="H.IO" Version="1.0.1" />
-    <PackageReference Include="H.Recorders.NAudioRecorder" Version="0.19.1" />
+    <PackageReference Include="H.Recorders.NAudioRecorder" Version="0.20.2" />
   </ItemGroup>
 
   <ItemGroup>
